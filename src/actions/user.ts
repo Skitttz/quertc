@@ -1,9 +1,11 @@
 import { currentUser } from "@clerk/nextjs/server";
+import { connectToDatabase } from "@/config/database";
 import type { IUserWithVirtual } from "@/interfaces/user";
 import { UserModel } from "@/models/user";
 
 export const getCurrentUser = async (): Promise<IUserWithVirtual | null> => {
   try {
+    await connectToDatabase();
     const clerkUser = await currentUser();
 
     if (!clerkUser) {
