@@ -1,11 +1,11 @@
 import { tv, type VariantProps } from "tailwind-variants";
 
 const headerVariants = tv({
-  base: "top-0 left-0 w-full z-50 border-b transition-all duration-300",
+  base: "top-0 left-0 w-full z-50 transition-all duration-300",
   variants: {
     sticky: {
-      true: "sticky w-full bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/70",
-      false: "absolute w-full bg-transparent",
+      true: "sticky w-full bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/70 shadow-xs border-b",
+      false: "sticky w-full bg-transparent border-b border-b-transparent",
     },
   },
   defaultVariants: {
@@ -14,7 +14,7 @@ const headerVariants = tv({
 });
 
 const navLinkVariants = tv({
-  base: "text-sm font-medium transition-colors duration-200 flex justify-between items-center",
+  base: "text-sm font-normal transition-colors duration-200 flex justify-between items-center hover:bg-transparent",
   variants: {
     variant: {
       desktop: "text-gray-600 hover:text-gray-900",

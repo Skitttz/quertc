@@ -1,4 +1,3 @@
-// header.tsx
 "use client";
 
 import { ArrowRight, Menu, X } from "lucide-react";
@@ -59,11 +58,11 @@ export function Header() {
   > = {
     desktop: () => (
       <Fragment>
-        <nav className="mx-auto hidden md:flex">
+        <nav className="hidden md:flex">
           <NavigationMenu>
             <NavigationMenuList className="flex gap-4">
               {NAVIGATION_LINKS.map((link) => (
-                <NavigationMenuItem key={link.href}>
+                <NavigationMenuItem key={link.label}>
                   <NavigationMenuLink asChild>
                     <Link
                       href={link.href}
@@ -113,7 +112,7 @@ export function Header() {
           <nav className="flex flex-col-reverse">
             {NAVIGATION_LINKS.map((link) => (
               <Link
-                key={link.href}
+                key={link.label}
                 href={link.href}
                 onClick={props.handleLinkClick}
                 className={navLinkVariants({ variant: "mobile" })}
@@ -152,9 +151,9 @@ export function Header() {
 
   return (
     <header className={headerVariants({ sticky: isSticky })}>
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <Logo className="h-6 w-auto" />
+          <Logo className="h-6 w-auto md:mr-48" />
         </Link>
 
         {headerMap[currentDevice](renderProps)}

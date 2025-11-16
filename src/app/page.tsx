@@ -1,8 +1,8 @@
-import { CTA } from "@/presentation/landing/CTA";
-import { Features } from "@/presentation/landing/Features";
-import { Footer } from "@/presentation/landing/Footer";
-import { Header } from "@/presentation/landing/Header";
-import { Hero } from "@/presentation/landing/Hero";
+import { CTA } from "@/components/landing/cta";
+import { Features } from "@/components/landing/features";
+import { Hero } from "@/components/landing/hero";
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
 
 export default function Home() {
   return (
