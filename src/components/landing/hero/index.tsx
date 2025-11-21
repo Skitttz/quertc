@@ -1,5 +1,5 @@
-import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MessageSquare } from "lucide-react";
 import { ChatPreview3D } from "./components/preview";
 import { heroStyles } from "./styles";
 
@@ -7,7 +7,7 @@ export function Hero() {
   const { container, badge, title, subtitle, buttons, preview } = heroStyles();
 
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center px-6 pt-2 md:pt-32 overflow-hidden">
+    <section className="min-h-screen flex flex-col items-center justify-center px-6 pt-2 md:pt-12 overflow-hidden">
       <div className={container()}>
         <div className="flex flex-col gap-1">
           <div className={badge()}>
@@ -60,7 +60,6 @@ export function Hero() {
           </div>
         </div>
       </div>
-
     </section>
   );
 }
