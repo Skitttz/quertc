@@ -5,6 +5,7 @@ enum AppRoutesEnum {
   SIGN_IN = "/sign-in",
   SIGN_UP = "/sign-up",
   BLOG = "/blog",
+  CHAT = "/chat",
 }
 
 export const AppPublicRoutes = [

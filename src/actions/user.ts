@@ -1,3 +1,4 @@
+"use server";
 import { currentUser } from "@clerk/nextjs/server";
 import { connectToDatabase } from "@/config/database";
 import type { IUserWithVirtual } from "@/interfaces/user";

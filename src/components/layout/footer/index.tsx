@@ -1,3 +1,31 @@
+import { COMPANY_LINKS } from "./constants";
+
 export function Footer() {
-  return <div></div>
+  const currentYear = new Date().getFullYear();
+  return (
+    <footer
+    >
+      <div className="max-w-7xl mx-auto px-6 py-14">
+        <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
+          <p className="text-gray-400">
+            © {currentYear} quertc. Todos os direitos reservados.
+          </p>
+          <nav aria-label="Links de apoio">
+            <ul className="flex items-center gap-6">
+              {COMPANY_LINKS.map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    className="text-gray-400 hover:text-blue-400 focus-visible:outline focus-visible:outline-blue-400 transition"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </footer>
+  );
 }

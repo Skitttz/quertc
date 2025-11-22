@@ -5,18 +5,24 @@ export function useMediaQuery({
 }: {
   customBreakpoint?: number;
 } = {}) {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
     const breakpoint = customBreakpoint ?? 768;
+
     const checkBreakpoint = () => {
       setIsMobile(window.innerWidth < breakpoint);
     };
-    checkBreakpoint();
 
+    checkBreakpoint();
     window.addEventListener("resize", checkBreakpoint);
+
     return () => window.removeEventListener("resize", checkBreakpoint);
   }, [customBreakpoint]);
 
-  return { isMobile, isDesktop: !isMobile };
+  return {
+    isMobile,
+    isDesktop: !isMobile,
+    ready: isMobile !== null,
+  };
 }
