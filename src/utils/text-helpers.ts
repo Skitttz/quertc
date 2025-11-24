@@ -9,4 +9,6 @@ const getNameInitials = ({ text }: { text: string | undefined }) => {
     .slice(0, 2);
 };
 
-export { getNameInitials };
+const toDocumentAnchorId = (text: string) => `#${text}`;
+
+export { getNameInitials, toDocumentAnchorId };
