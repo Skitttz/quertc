@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
+import { LANDING_IDS } from "../constants";
 import { ChatPreview3D } from "./components/preview";
 import { heroStyles } from "./styles";
 
@@ -7,7 +8,10 @@ export function Hero() {
   const { container, badge, title, subtitle, buttons, preview } = heroStyles();
 
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center px-6 pt-2 md:pt-12 overflow-hidden">
+    <section
+      className="min-h-screen flex flex-col items-center justify-center px-6 pt-2 md:pt-12 overflow-hidden"
+      id={LANDING_IDS.HERO}
+    >
       <div className={container()}>
         <div className="flex flex-col gap-1">
           <div className={badge()}>
