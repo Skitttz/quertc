@@ -8,12 +8,11 @@ interface IHeaderRenderProps {
   onDrawerOpenChange: (v: boolean) => void;
 }
 
-type SafeUserType = Omit<
+type ISafeUserType = Omit<
   IUserWithVirtual,
   | "_id"
   | "createdAt"
   | "updatedAt"
-  | "email"
   | "firstName"
   | "lastName"
   | "username"
@@ -21,11 +20,7 @@ type SafeUserType = Omit<
 > & {
   _id: string;
   createdAt: string;
-  profilePicture: string | undefined;
+  profilePicture?: string | null;
 };
 
-interface IHeaderProps {
-  currentUser: SafeUserType | null;
-}
-
-export type { DeviceType, IHeaderProps, IHeaderRenderProps };
+export type { DeviceType, IHeaderRenderProps, ISafeUserType };
