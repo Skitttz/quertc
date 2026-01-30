@@ -1,38 +1,46 @@
 "use client";
 
+import { Logo } from "@/components/logo";
+import { useAppSelector } from "@/providers/store/hooks";
+import { AppRoutesEnum } from "@/shared/route";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ProfileDrawer } from "@/components/chat/drawer";
-import { Divisor } from "@/components/divisor";
-import { Logo } from "@/components/logo";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetTrigger } from "@/components/ui/sheet";
-import { useAppSelector } from "@/providers/store/hooks";
-import { AppRoutesEnum } from "@/shared/route";
-import { getNameInitials } from "@/utils/text-helpers";
 import { SCROLL_THRESHOLD } from "./constants";
 import { headerVariants } from "./styles";
-import type { IHeaderRenderProps, ISafeUserType } from "./types";
+import type { ISafeUserType } from "./types";
+import { UserMenu } from "./user/components/menu";
 
 export function Header() {
   const [isSticky, setIsSticky] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
 
+  const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const currentSelectorUser = useAppSelector((state) => state.user);
-
   const { currentUserData } = currentSelectorUser;
 
   const currentUserInfo: ISafeUserType | null = currentUserData
     ? {
-      _id: String(currentUserData._id || ""),
-      clerkUserId: currentUserData.clerkUserId ?? null,
-      name: currentUserData.name ?? "",
-      email: currentUserData.email ?? "",
-      profilePicture: currentUserData?.profilePicture,
-      createdAt: currentUserData.createdAt,
-    }
+        _id: String(currentUserData._id || ""),
+        clerkUserId: currentUserData.clerkUserId ?? null,
+        name: currentUserData.name ?? "",
+        email: currentUserData.email ?? "",
+        profilePicture: currentUserData?.profilePicture,
+        createdAt: currentUserData.createdAt,
+      }
     : null;
+
+  useEffect(() => {
+    if (currentUserInfo?.profilePicture) {
+      setAvatarUrl(currentUserInfo.profilePicture);
+    }
+  }, [currentUserInfo?.profilePicture]);
+
+  const handleAvatarChange = useCallback((newAvatarUrl: string) => {
+    setIsAvatarLoading(true);
+    setAvatarUrl(newAvatarUrl);
+  }, []);
 
   const handleScroll = useCallback(() => {
     setIsSticky(window.scrollY > SCROLL_THRESHOLD);
@@ -53,10 +61,16 @@ export function Header() {
     );
   }
 
-  const headerProps: IHeaderRenderProps = {
-    isSticky,
-    isDrawerOpen,
-    onDrawerOpenChange: setIsDrawerOpen,
+  const userMenuProps = {
+    isOpen: isDrawerOpen,
+    onOpenChange: setIsDrawerOpen,
+    name: currentUserInfo.name,
+    userId: String(currentUserInfo._id),
+    profilePicture: avatarUrl || currentUserInfo.profilePicture || "",
+    registrationDate: String(currentUserInfo.createdAt),
+    onAvatarChange: handleAvatarChange,
+    isAvatarLoading,
+    onAvatarLoaded: () => setIsAvatarLoading(false),
   };
 
   return (
@@ -70,75 +84,11 @@ export function Header() {
         </Link>
 
         <div className="hidden md:flex">
-          <Sheet
-            open={headerProps.isDrawerOpen}
-            onOpenChange={headerProps.onDrawerOpenChange}
-          >
-            <SheetTrigger asChild>
-              <button
-                className="flex items-center gap-3 cursor-pointer select-none"
-                aria-label="Abrir menu do usuário"
-                type="button"
-              >
-                <span className="font-medium leading-none">
-                  {currentUserInfo?.name || ""}
-                </span>
-
-                <Divisor />
-
-                <Avatar className="h-9 w-9 flex-shrink-0">
-                  <AvatarImage src={currentUserInfo?.profilePicture ?? ""} />
-                  <AvatarFallback>
-                    {getNameInitials({ text: currentUserInfo?.name })}
-                  </AvatarFallback>
-                </Avatar>
-              </button>
-            </SheetTrigger>
-
-            <ProfileDrawer
-              closeDrawer={() => headerProps.onDrawerOpenChange(false)}
-              name={currentUserInfo?.name ?? ""}
-              userId={String(currentUserInfo?._id)}
-              avatarUrl={currentUserInfo?.profilePicture || undefined}
-              registrationDate={String(currentUserInfo?.createdAt)}
-            />
-          </Sheet>
+          <UserMenu {...userMenuProps} variant="desktop" />
         </div>
 
         <div className="flex md:hidden">
-          <Sheet
-            open={headerProps.isDrawerOpen}
-            onOpenChange={headerProps.onDrawerOpenChange}
-          >
-            <SheetTrigger asChild>
-              <button
-                className="flex items-center gap-2 cursor-pointer select-none"
-                aria-label="Abrir menu do usuário"
-                type="button"
-              >
-                <Avatar className="h-9 w-9">
-                  <AvatarImage src={currentUserInfo?.profilePicture ?? ""} />
-                  <AvatarFallback>
-                    {getNameInitials({ text: currentUserInfo?.name })}
-                  </AvatarFallback>
-                </Avatar>
-
-                <Divisor className="hidden md:block" />
-
-                <span className="hidden md:block font-medium text-sm leading-none truncate max-w-[120px]">
-                  {getNameInitials({ text: currentUserInfo?.name })}
-                </span>
-              </button>
-            </SheetTrigger>
-
-            <ProfileDrawer
-              closeDrawer={() => headerProps.onDrawerOpenChange(false)}
-              name={currentUserInfo?.name ?? ""}
-              userId={String(currentUserInfo?._id)}
-              avatarUrl={currentUserInfo?.profilePicture || undefined}
-              registrationDate={String(currentUserInfo?.createdAt || "")}
-            />
-          </Sheet>
+          <UserMenu {...userMenuProps} variant="mobile" />
         </div>
       </div>
     </header>

@@ -3,7 +3,15 @@ interface IProfileDrawerProps {
   name: string;
   userId: string;
   registrationDate: string;
-  avatarUrl?: string;
-  onAvatarChange?: (file: File) => void;
+  defaultAvatar: string;
+  onAvatarChange?: (file: string) => void;
+  onAvatarLoaded: () => void;
+  isAvatarLoading: boolean;
 }
-export type { IProfileDrawerProps };
+
+interface IUploadStateProps {
+  status: "idle" | "uploading" | "success" | "error";
+  progress: number;
+}
+
+export type { IProfileDrawerProps, IUploadStateProps };

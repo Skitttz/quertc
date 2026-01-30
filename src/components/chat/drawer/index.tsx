@@ -1,7 +1,4 @@
-import { useClerk } from "@clerk/nextjs";
-import { Calendar, Hash, Loader2, LogOut, User } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { updateUserAvatar } from "@/actions/user";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,23 +14,93 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AppRoutesEnum } from "@/shared/route";
+import { patchCurrentUserData } from "@/store/userSlice";
 import { formatLongDatePtBr } from "@/utils/date-helpers";
 import { getNameInitials } from "@/utils/text-helpers";
+import { beforeUpload, uploadFileToFirebase } from "@/utils/upload-helpers";
+import { useClerk } from "@clerk/nextjs";
+import { Calendar, Loader2, LogOut, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { AvatarOverlay } from "./avatar";
+import { AvatarOverlayEnum } from "./constants";
 import { ItemInfo } from "./itemInfo";
 import { drawerStyles } from "./styles";
-import type { IProfileDrawerProps } from "./types";
+import type { IProfileDrawerProps, IUploadStateProps } from "./types";
 
 export function ProfileDrawer({
   closeDrawer,
   name,
   userId,
+  defaultAvatar,
   registrationDate,
-  avatarUrl,
   onAvatarChange,
+  onAvatarLoaded,
+  isAvatarLoading,
 }: IProfileDrawerProps) {
   const { signOut } = useClerk();
-  const [isLoadingSignout, setIsLoadingSignOut] = useState<boolean>(false);
-  const { icon } = drawerStyles();
+  const { icon, avatarOverlay } = drawerStyles();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dispatch = useDispatch();
+  const [isLoadingSignout, setIsLoadingSignOut] = useState(false);
+  const [upload, setUpload] = useState<IUploadStateProps>({
+    status: "idle",
+    progress: 0,
+  });
+
+  const [preview, setPreview] = useState<string | null>(null);
+  const avatarUrl = preview ?? defaultAvatar;
+
+  const avatarOverlayState =
+    upload.status === "uploading"
+      ? AvatarOverlayEnum.uploading
+      : isAvatarLoading
+        ? AvatarOverlayEnum.loading
+        : AvatarOverlayEnum.idle;
+  const isOverlayAlwaysVisible =
+    avatarOverlayState === AvatarOverlayEnum.uploading ||
+    avatarOverlayState === AvatarOverlayEnum.loading;
+
+  const isShowingPreview = Boolean(preview);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!beforeUpload(file)) return;
+    setPreview(URL.createObjectURL(file));
+    uploadToFirebase(file);
+  };
+
+  const uploadToFirebase = async (file: File) => {
+    try {
+      setUpload({ status: "uploading", progress: 0 });
+
+      const extension = file.name.split(".").pop() ?? "jpg";
+      const path = `avatars/${userId}.${extension}`;
+
+      const downloadURL = await uploadFileToFirebase(
+        { file, path },
+        {
+          onProgress: (progress) =>
+            setUpload((prev) => ({ ...prev, progress })),
+        },
+      );
+
+      await updateUserAvatar({ avatarUrl: downloadURL });
+      onAvatarChange?.(downloadURL);
+      setUpload({ status: "success", progress: 100 });
+      dispatch(
+        patchCurrentUserData({
+          profilePicture: downloadURL,
+        }),
+      );
+    } catch (error) {
+      console.error(error);
+      setUpload({ status: "error", progress: 0 });
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -47,18 +114,11 @@ export function ProfileDrawer({
     }
   };
 
-  const handleAvatarClick = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file && onAvatarChange) {
-        onAvatarChange(file);
-      }
-    };
-    input.click();
-  };
+  useEffect(() => {
+    if (preview && defaultAvatar === preview) {
+      setPreview(null);
+    }
+  }, [defaultAvatar, preview]);
 
   return (
     <SheetContent
@@ -68,29 +128,60 @@ export function ProfileDrawer({
       <SheetHeader className="sr-only">
         <SheetTitle>Perfil do Usuário</SheetTitle>
       </SheetHeader>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
       <div className="flex flex-col items-center gap-3 pt-4">
-        <div className="flex flex-col items-center gap-2">
-          <button
-            type="button"
-            className="relative group cursor-pointer"
-            onClick={handleAvatarClick}
-          >
-            <Avatar className="w-24 h-24 border-2 border-border">
-              <AvatarImage src={avatarUrl} alt={name} />
+        <button
+          type="button"
+          className="relative group cursor-pointer"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={upload.status === "uploading"}
+        >
+          <Avatar className="w-24 h-24 border-2 border-border">
+            <AvatarImage
+              key={avatarUrl}
+              src={avatarUrl}
+              alt={name}
+              onLoad={() => {
+                if (!isShowingPreview) {
+                  onAvatarLoaded?.();
+                }
+              }}
+              onError={() => {
+                if (!isShowingPreview) {
+                  onAvatarLoaded?.();
+                }
+              }}
+            />
+            {!avatarUrl && (
               <AvatarFallback className="text-2xl">
                 {getNameInitials({ text: name })}
               </AvatarFallback>
-            </Avatar>
+            )}
+          </Avatar>
 
-            <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <span className="text-white text-xs font-medium">Alterar</span>
-            </div>
-          </button>
+          <div
+            className={avatarOverlay({
+              overlayVisible: isOverlayAlwaysVisible,
+            })}
+          >
+            <AvatarOverlay
+              progress={upload.progress}
+              state={avatarOverlayState}
+            />
+          </div>
+        </button>
 
-          <span className="text-xs text-muted-foreground">
-            Clique para alterar sua foto
-          </span>
-        </div>
+        <span className="text-xs text-muted-foreground">
+          Clique para alterar sua foto
+        </span>
       </div>
 
       <div className="flex flex-col gap-4 border-t pt-4">
@@ -100,17 +191,13 @@ export function ProfileDrawer({
           icon={<User className={icon()} />}
         />
         <ItemInfo
-          name="Seu ID"
-          value={userId}
-          icon={<Hash className={icon()} />}
-        />
-        <ItemInfo
           name="Iniciou em"
           value={formatLongDatePtBr(registrationDate)}
           icon={<Calendar className={icon()} />}
         />
       </div>
 
+      {/* Logout */}
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button variant="outline" className="mt-auto w-full">
