@@ -19,7 +19,7 @@ import { formatLongDatePtBr } from "@/utils/date-helpers";
 import { getNameInitials } from "@/utils/text-helpers";
 import { beforeUpload, uploadFileToFirebase } from "@/utils/upload-helpers";
 import { useClerk } from "@clerk/nextjs";
-import { Calendar, Loader2, LogOut, User } from "lucide-react";
+import { Calendar, Hash, Loader2, LogOut, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { AvatarOverlay } from "./avatar";
@@ -191,16 +191,23 @@ export function ProfileDrawer({
           icon={<User className={icon()} />}
         />
         <ItemInfo
+          name="Seu ID"
+          value={userId}
+          icon={<Hash className={icon()} />}
+          tooltip={{
+            content: "Compartilhe este ID para iniciar uma nova conversa",
+          }}
+        />
+        <ItemInfo
           name="Iniciou em"
           value={formatLongDatePtBr(registrationDate)}
           icon={<Calendar className={icon()} />}
         />
       </div>
 
-      {/* Logout */}
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="outline" className="mt-auto w-full">
+          <Button variant="destructive" className="mt-auto w-full">
             <LogOut className="w-4 h-4 mr-2" />
             Sair
           </Button>
