@@ -1,6 +1,6 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Loader2 } from "lucide-react"; // << aqui
+import { Loader2 } from "lucide-react";
 import type * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -56,11 +56,21 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn("relative", buttonVariants({ variant, size, className }))}
       disabled={disabled || loading}
       {...props}
     >
-      {children}
+      <span
+        className={cn("inline-flex items-center gap-2", loading && "opacity-0")}
+      >
+        {children}
+      </span>
+
+      {loading && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <Loader2 className="size-4 animate-spin" />
+        </span>
+      )}
     </Comp>
   );
 }

@@ -1,7 +1,7 @@
 import type mongoose from "mongoose";
 
 export interface IUser {
-  _id: mongoose.Types.ObjectId;
+  _id: mongoose.Types.ObjectId | string;
   clerkUserId: string;
   firstName: string;
   lastName: string;

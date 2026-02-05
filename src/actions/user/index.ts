@@ -57,6 +57,23 @@ export const getCurrentUser = async (): Promise<IUserWithVirtual | null> => {
   }
 };
 
+export const getAllUsers = async (): Promise<IUserWithVirtual[]> => {
+  try {
+    await connectToDatabase();
+
+    const users = await UserModel.find().lean();
+
+    return users.map((user) => ({
+      ...user,
+      _id: user._id.toString(),
+      name: `${user.firstName} ${user.lastName}`.trim(),
+    }));
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export async function updateUser<T>({
   userId,
   payload,

@@ -27,7 +27,7 @@ export const UserMenuTrigger = forwardRef<
 
       <Avatar className={isDesktop ? "h-9 w-9 flex-shrink-0" : "h-9 w-9"}>
         {profilePicture ? (
-          <AvatarImage src={profilePicture} />
+          <AvatarImage src={profilePicture} className="object-cover" />
         ) : (
           <AvatarFallback>{getNameInitials({ text: name })}</AvatarFallback>
         )}

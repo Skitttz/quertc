@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AppRoutesEnum } from "@/shared/route";
-import { patchCurrentUserData } from "@/store/userSlice";
+import { patchCurrentUserData } from "@/store/slice/user";
 import { formatLongDatePtBr } from "@/utils/date-helpers";
 import { getNameInitials } from "@/utils/text-helpers";
 import { beforeUpload, uploadFileToFirebase } from "@/utils/upload-helpers";
@@ -148,6 +148,7 @@ export function ProfileDrawer({
             <AvatarImage
               key={avatarUrl}
               src={avatarUrl}
+              className="object-cover"
               alt={name}
               onLoad={() => {
                 if (!isShowingPreview) {
