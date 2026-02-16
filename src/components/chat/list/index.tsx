@@ -1,9 +1,9 @@
 "use client";
 
+import { type JSX, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
 import type { ChatState } from "@/store/slice/chat";
 import { fetchChatsByUser } from "@/store/thunks/chat";
-import { useEffect, type JSX } from "react";
 import { ChatHeaderList } from "./header";
 import { ChatItem } from "./item";
 import { ChatListShimmer } from "./shimmer";

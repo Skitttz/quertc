@@ -8,14 +8,8 @@ export function AuthContainer({ children }: { children: React.ReactNode }) {
   return (
     <div className={container()}>
       <div className={containerLink()}>
-        <Link
-          href={AppRoutesEnum.HOME}
-          className={linkItem()}
-        >
-          <ArrowLeft
-            size={18}
-            className={icon()}
-          />
+        <Link href={AppRoutesEnum.HOME} className={linkItem()}>
+          <ArrowLeft size={18} className={icon()} />
           Voltar para Página Inicial
         </Link>
       </div>

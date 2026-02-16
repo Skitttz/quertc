@@ -3,9 +3,9 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import {
-  DEFAULT_MESSAGES,
   createAvatarSprite,
   createTextCanvasTexture,
+  DEFAULT_MESSAGES,
 } from "./constants";
 import type { AnimEntryType, IChatPreviewProps } from "./types";
 

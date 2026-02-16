@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import type { IRequestCreateChat } from "@/actions/chat/types";
 import { getAllUsers } from "@/actions/user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,7 +9,6 @@ import type { IUserWithVirtual } from "@/interfaces/user";
 import { useAppSelector } from "@/providers/store/hooks";
 import { useChat } from "@/use-cases/create-chat";
 import { getNameInitials } from "@/utils/text-helpers";
-import { useEffect, useMemo, useState } from "react";
 import { NewChatListUsersEmpty } from "./empty";
 import { NewChatListUsersShimmer } from "./shimmer";
 import type { NewChatListUsersProps } from "./types";
@@ -25,18 +25,6 @@ export function NewChatListUsers({
   const { currentUserData } = useAppSelector((state) => state.user);
   const { chats } = useAppSelector((state) => state.chat);
   const { createChat } = useChat();
-
-  const hasPrivateChatWithUser = (userId?: string) =>
-    chats.some(
-      (chat) =>
-        !chat.isGroupChat && chat.users.some((user) => user._id === userId),
-    );
-
-  const isUserAlreadyInMyGroup = (userId?: string) =>
-    chats.some(
-      (chat) =>
-        chat.isGroupChat && chat.users.some((user) => user._id === userId),
-    );
 
   const handleCreateNewChat = async ({
     targetUserId,
@@ -64,9 +52,20 @@ export function NewChatListUsers({
     }
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const availableUsers = useMemo(() => {
     if (!currentUserData?._id) return [];
+
+    const hasPrivateChatWithUser = (userId?: string) =>
+      chats.some(
+        (chat) =>
+          !chat.isGroupChat && chat.users.some((user) => user._id === userId),
+      );
+
+    const isUserAlreadyInMyGroup = (userId?: string) =>
+      chats.some(
+        (chat) =>
+          chat.isGroupChat && chat.users.some((user) => user._id === userId),
+      );
 
     return users.filter((user) => {
       if (user._id === currentUserData._id) return false;

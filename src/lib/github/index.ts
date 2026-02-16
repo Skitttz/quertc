@@ -1,7 +1,5 @@
 import { generateSlug } from "@/utils/generate-slug";
 import type { GitHubIssue } from "./types";
-import { remark } from "remark";
-
 
 async function fetchGitHub(endpoint: string) {
   const headers: HeadersInit = {
@@ -9,7 +7,7 @@ async function fetchGitHub(endpoint: string) {
   };
 
   if (process.env.GITHUB_TOKEN) {
-    headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   }
 
   const url = `https://api.github.com/repos/${process.env.GITHUB_REPO}${endpoint}`;
@@ -33,9 +31,7 @@ async function fetchGitHub(endpoint: string) {
 }
 
 export async function getAllPosts(): Promise<GitHubIssue[]> {
-  return fetchGitHub(
-    "/issues?state=open&sort=created&direction=desc",
-  );
+  return fetchGitHub("/issues?state=open&sort=created&direction=desc");
 }
 
 export function extractFirstImage(body: string): string | null {
@@ -64,12 +60,13 @@ export function removeImagesFromBody(body: string): string {
 export function getPostPreviewSimple(body: string, maxLength = 150) {
   if (!body) return "";
   let clean = body.replace(/!\[.*?\]\(.*?\)/g, "").replace(/<img [^>]*>/g, "");
-  clean = clean.replace(/[#*_>`~-]/g, ""); 
+  clean = clean.replace(/[#*_>`~-]/g, "");
   clean = clean.replace(/\n+/g, " ").trim();
 
-  return clean.length > maxLength ? clean.substring(0, maxLength) + "..." : clean;
+  return clean.length > maxLength
+    ? `${clean.substring(0, maxLength)}...`
+    : clean;
 }
-
 
 export async function getPostBySlug(slug: string): Promise<GitHubIssue | null> {
   const posts = await getAllPosts();

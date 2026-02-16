@@ -1,5 +1,5 @@
-import { storage } from "@/config/firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { storage } from "@/config/firebase";
 
 type UploadCallbacks = {
   onProgress?: (progress: number) => void;

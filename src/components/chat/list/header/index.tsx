@@ -1,5 +1,5 @@
-import { Input } from "@/components/ui/input";
 import { TextSearchIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { NewChatDropdown } from "../new";
 
 export function ChatHeaderList({ title }: { title: string }) {

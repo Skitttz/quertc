@@ -5,15 +5,15 @@ interface IChat {
   _id: string;
   users: IUser[];
   createdBy: IUser;
-  lastMessage: IMessage;
+  lastMessage?: IMessage | null;
   isGroupChat: boolean;
-  groupName: string;
-  groupProfilePicture: string;
-  groupBio: string;
-  groupAdmins: IUser[];
+  groupName?: string;
+  groupProfilePicture?: string;
+  groupBio?: string;
+  groupAdmins?: IUser[];
   createdAt: string;
   updatedAt: string;
-  unreadCounts: unknown;
+  unreadCounts?: Record<string, number>;
 }
 
 export type { IChat };

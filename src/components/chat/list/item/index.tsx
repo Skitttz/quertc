@@ -1,5 +1,6 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppSelector } from "@/providers/store/hooks";
-import Image from "next/image";
+import { getNameInitials } from "@/utils/text-helpers";
 import type { ChatItemProps } from "./types";
 
 export function ChatItem({
@@ -23,19 +24,30 @@ export function ChatItem({
     ? groupName
     : (recipient?.username ?? "Usuário");
 
-  const hasUnreadMessage =
-    !!currentUserData &&
-    !lastMessage?.readBy?.some((user) => user._id === currentUserData._id);
+  const readByIds =
+    lastMessage?.readBy?.map((user) =>
+      typeof user === "string" ? user : user._id,
+    ) ?? [];
+
+  const hasUnreadMessage = currentUserData
+    ? !readByIds.includes(currentUserData._id)
+    : false;
 
   return (
     <div className="flex items-center gap-3 cursor-pointer rounded-md p-2 transition-colors">
-      <Image
-        src={avatarSrc}
-        width={60}
-        height={60}
-        alt={`Avatar de ${displayName}`}
-        className="size-12 shrink-0 rounded-full object-cover"
-      />
+      <Avatar className="size-12 shrink-0">
+        {avatarSrc ? (
+          <AvatarImage
+            src={avatarSrc}
+            alt={`Avatar de ${displayName}`}
+            className="object-cover"
+          />
+        ) : (
+          <AvatarFallback className="text-lg">
+            {getNameInitials({ text: displayName })}
+          </AvatarFallback>
+        )}
+      </Avatar>
 
       <div className="flex min-w-0 flex-col gap-1">
         <p className="truncate font-semibold">{displayName}</p>

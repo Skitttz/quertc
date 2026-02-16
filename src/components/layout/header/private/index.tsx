@@ -1,11 +1,11 @@
 "use client";
 
-import { Logo } from "@/components/logo";
-import { useAppSelector } from "@/providers/store/hooks";
-import { AppRoutesEnum } from "@/shared/route";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { Logo } from "@/components/logo";
+import { useAppSelector } from "@/providers/store/hooks";
+import { AppRoutesEnum } from "@/shared/route";
 import { SCROLL_THRESHOLD } from "./constants";
 import { headerVariants } from "./styles";
 import type { ISafeUserType } from "./types";

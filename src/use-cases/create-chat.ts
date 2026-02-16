@@ -10,6 +10,9 @@ export function useChat() {
 
   async function createChat(payload: IRequestCreateChat) {
     const newChat = await postNewChat({ payload });
+    if (!newChat) {
+      return null;
+    }
     dispatch(AddChat(newChat));
     return newChat;
   }

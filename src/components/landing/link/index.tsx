@@ -1,6 +1,6 @@
 "use client";
-import { scrollTo } from "@/utils/scroll-to";
 import Link from "next/link";
+import { scrollTo } from "@/utils/scroll-to";
 import type { LinkLandingProps } from "./types";
 
 export function LinkScrollTo({ label, isRedirect, href }: LinkLandingProps) {

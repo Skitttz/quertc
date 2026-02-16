@@ -20,4 +20,3 @@ function AvatarOverlay({
 }
 
 export { AvatarOverlay };
-

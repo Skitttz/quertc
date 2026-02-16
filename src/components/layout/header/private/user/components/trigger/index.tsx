@@ -1,7 +1,7 @@
+import { forwardRef } from "react";
 import { Divisor } from "@/components/divisor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getNameInitials } from "@/utils/text-helpers";
-import { forwardRef } from "react";
 import type { IUserMenuTriggerProps } from "./types";
 
 export const UserMenuTrigger = forwardRef<

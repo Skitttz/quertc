@@ -1,3 +1,3 @@
 export function CTA() {
-  return <div></div>
+  return <div></div>;
 }

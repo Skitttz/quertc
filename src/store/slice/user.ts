@@ -1,5 +1,5 @@
-import type { ISafeUserType } from "@/components/layout/header/private/types";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { ISafeUserType } from "@/components/layout/header/private/types";
 
 interface IUserState {
   currentUserData: ISafeUserType | null;

@@ -1,3 +1,7 @@
+import { useClerk } from "@clerk/nextjs";
+import { Calendar, Hash, Loader2, LogOut, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { updateUserAvatar } from "@/actions/user";
 import {
   AlertDialog,
@@ -18,10 +22,6 @@ import { patchCurrentUserData } from "@/store/slice/user";
 import { formatLongDatePtBr } from "@/utils/date-helpers";
 import { getNameInitials } from "@/utils/text-helpers";
 import { beforeUpload, uploadFileToFirebase } from "@/utils/upload-helpers";
-import { useClerk } from "@clerk/nextjs";
-import { Calendar, Hash, Loader2, LogOut, User } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
 import { AvatarOverlay } from "./avatar";
 import { AvatarOverlayEnum } from "./constants";
 import { ItemInfo } from "./itemInfo";

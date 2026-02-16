@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { LANDING_IDS } from "../constants";
 import { ChatPreview3D } from "./components/preview";
 import { heroStyles } from "./styles";

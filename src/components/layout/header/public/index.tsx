@@ -121,8 +121,15 @@ export function Header() {
               </Link>
             ))}
             <div className="flex flex-col gap-3 bg-gray-50 py-4 px-3 border-b overflow-hidden">
-              <Button variant="ghost" asChild className="w-full justify-start border pt-2">
-                <Link href={AppRoutesEnum.SIGN_IN} onClick={props.handleLinkClick}>
+              <Button
+                variant="ghost"
+                asChild
+                className="w-full justify-start border pt-2"
+              >
+                <Link
+                  href={AppRoutesEnum.SIGN_IN}
+                  onClick={props.handleLinkClick}
+                >
                   Entrar
                 </Link>
               </Button>
@@ -131,7 +138,10 @@ export function Header() {
                 asChild
                 className="w-full justify-start"
               >
-                <Link href={AppRoutesEnum.SIGN_UP} onClick={props.handleLinkClick}>
+                <Link
+                  href={AppRoutesEnum.SIGN_UP}
+                  onClick={props.handleLinkClick}
+                >
                   Começar grátis
                 </Link>
               </Button>

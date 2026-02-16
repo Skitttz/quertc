@@ -1,4 +1,6 @@
 "use client";
+import { MessageCirclePlusIcon } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,8 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MessageCirclePlusIcon } from "lucide-react";
-import { useState } from "react";
 import { NewChatDialog } from "./components/dialog";
 import type { NewChatDialogVariant } from "./components/dialog/types";
 import { newChatDropdownItems } from "./constants";

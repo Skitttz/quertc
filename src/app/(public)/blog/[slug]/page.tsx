@@ -1,14 +1,13 @@
-import { Calendar, Clock, MessageCircle, Tag, ArrowLeft } from "lucide-react";
-import Image from "next/image";
+import { ArrowLeft, Calendar, Clock, MessageCircle, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PublicContainer } from "@/components/public/PublicContainer";
+import { Suspense } from "react";
 import { MDXContent } from "@/components/blog/mdx";
+import { PublicContainer } from "@/components/public/PublicContainer";
 import { getAllPosts } from "@/lib/github";
 import { AppRoutesEnum } from "@/shared/route";
 import { formatLongDatePtBr } from "@/utils/date-helpers";
 import { generateSlug } from "@/utils/generate-slug";
-import { Suspense } from "react";
 
 interface BlogPostPageProps {
   params: {
@@ -60,7 +59,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           href={AppRoutesEnum.BLOG}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-8 group"
         >
-          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft
+            size={20}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
           <span>Voltar para o blog</span>
         </Link>
 
@@ -102,7 +104,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="flex items-center gap-2">
               <MessageCircle size={16} className="text-green-500" />
               <span>
-                {post.comments} {post.comments === 1 ? "comentário" : "comentários"}
+                {post.comments}{" "}
+                {post.comments === 1 ? "comentário" : "comentários"}
               </span>
             </div>
           </div>

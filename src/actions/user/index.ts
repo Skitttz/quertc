@@ -1,9 +1,9 @@
 "use server";
+import { currentUser } from "@clerk/nextjs/server";
+import { Types } from "mongoose";
 import { connectToDatabase } from "@/config/database";
 import type { IUserWithVirtual } from "@/interfaces/user";
 import { UserModel } from "@/models/user";
-import { currentUser } from "@clerk/nextjs/server";
-import { Types } from "mongoose";
 import { ALLOWED_FIELDS } from "./constants";
 import type {
   AllowedUserFieldsUpdateType,

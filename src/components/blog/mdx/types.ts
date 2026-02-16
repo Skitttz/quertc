@@ -1,5 +1,5 @@
 interface MDXComponents {
-  [key: string]: React.ComponentType<any>; 
+  [key: string]: React.ComponentType<unknown>;
 }
 
 interface MDXContentProps {

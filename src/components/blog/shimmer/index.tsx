@@ -7,5 +7,5 @@ export function ShimmerBlog() {
       <div className="h-6 w-full bg-gray-300 rounded"></div>
       <div className="h-6 w-5/6 bg-gray-300 rounded"></div>
     </div>
-  )
+  );
 }

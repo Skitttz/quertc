@@ -13,14 +13,11 @@ import { AppRoutesEnum } from "@/shared/route";
 import { formatLongDatePtBr } from "@/utils/date-helpers";
 import { generateSlug } from "@/utils/generate-slug";
 
-
-
 export async function generateMetadata() {
-
-
   return {
     title: "Quertc | Blog e Atualizações",
-    description: "Mantenha-se atualizado com as últimas notícias, tutoriais e insights sobre o projeto Quertc no nosso blog oficial.",
+    description:
+      "Mantenha-se atualizado com as últimas notícias, tutoriais e insights sobre o projeto Quertc no nosso blog oficial.",
   };
 }
 
@@ -98,7 +95,6 @@ export default async function BlogPage() {
                         className="group block"
                       >
                         <article className="h-full bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 hover:-translate-y-2">
-
                           {image ? (
                             <div className="relative h-48 w-full overflow-hidden bg-gray-100">
                               <Image
@@ -117,7 +113,6 @@ export default async function BlogPage() {
                           )}
 
                           <div className="p-6 space-y-4">
-
                             {post.labels.length > 0 && (
                               <div className="flex flex-wrap gap-2">
                                 {post.labels.slice(0, 3).map((label) => {
@@ -149,10 +144,7 @@ export default async function BlogPage() {
 
                             <div className="pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
                               <div className="flex items-center gap-1.5">
-                                <Calendar
-                                  size={14}
-                                  className="text-blue-500"
-                                />
+                                <Calendar size={14} className="text-blue-500" />
                                 <span>
                                   {formatLongDatePtBr(post.created_at)}
                                 </span>

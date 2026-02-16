@@ -1,5 +1,5 @@
-import type { IChat } from "@/interfaces/chat";
 import { createSlice } from "@reduxjs/toolkit";
+import type { IChat } from "@/interfaces/chat";
 import { fetchChatsByUser } from "../thunks/chat";
 
 export interface ChatState {

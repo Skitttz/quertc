@@ -3,11 +3,11 @@ import type { IUser } from "./user";
 
 export interface IMessage {
   _id: string;
-  chat: IChat;
-  sender: IUser;
+  chat: IChat | string;
+  sender: IUser | string;
   text: string;
   image: string;
-  readBy: IUser[];
+  readBy: Array<IUser | string>;
   createdAt: string;
   updatedAt: string;
 }
