@@ -1,12 +1,12 @@
 import { MessageSquare } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { LANDING_IDS } from "../constants";
+import { HeroAction } from "./components/action";
 import { ChatPreview } from "./components/preview";
 import { heroStyles } from "./styles";
 
 export function Hero() {
-  const { container, badge, title, subtitle, buttons, preview } = heroStyles();
+  const { container, badge, title, subtitle, preview } = heroStyles();
 
   return (
     <section
@@ -31,29 +31,7 @@ export function Hero() {
           </div>
         </div>
 
-        <div className={buttons()}>
-          <div className="flex items-center justify-center gap-3">
-            <Button
-              type="button"
-              size="lg"
-              variant="default"
-              className="hover:bg-blue-800 shadow-md transition-all duration-200"
-            >
-              Experimente agora
-            </Button>
-            <Button
-              type="button"
-              size="lg"
-              variant="ghost"
-              className="hover:bg-transparent transition-all duration-200"
-            >
-              Saiba mais
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground mt-2 text-center italic">
-            Leva menos de 1 minuto para começar!
-          </p>
-        </div>
+        <HeroAction />
       </div>
 
       <div className={preview()}>
