@@ -2,11 +2,6 @@ import { LANDING_IDS } from "@/components/landing/constants";
 
 const NAVIGATION_LINKS = [
   {
-    label: "Contato",
-    href: LANDING_IDS.CONTACT,
-    isInternal: true,
-  },
-  {
     label: "Sobre",
     href: LANDING_IDS.ABOUT,
     isInternal: true,
