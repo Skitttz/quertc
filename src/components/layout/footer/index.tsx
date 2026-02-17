@@ -5,7 +5,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
   return (
     <footer>
-      <div className="max-w-7xl mx-auto px-6 py-14">
+      <div className="max-w-7xl mx-auto px-0 md:px-6 py-14">
         <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
           <p className="text-gray-700">
             © {currentYear} quertc. Todos os direitos reservados.

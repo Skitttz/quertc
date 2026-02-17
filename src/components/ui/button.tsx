@@ -53,13 +53,8 @@ function Button({
   }) {
   const Comp = asChild ? Slot : "button";
 
-  return (
-    <Comp
-      data-slot="button"
-      className={cn("relative", buttonVariants({ variant, size, className }))}
-      disabled={disabled || loading}
-      {...props}
-    >
+  const content = (
+    <>
       <span
         className={cn("inline-flex items-center gap-2", loading && "opacity-0")}
       >
@@ -71,6 +66,18 @@ function Button({
           <Loader2 className="size-4 animate-spin" />
         </span>
       )}
+    </>
+  );
+
+  return (
+    <Comp
+      data-slot="button"
+      aria-busy={loading}
+      className={cn("relative", buttonVariants({ variant, size, className }))}
+      disabled={disabled || loading}
+      {...props}
+    >
+      {asChild ? <span className="relative">{content}</span> : content}
     </Comp>
   );
 }

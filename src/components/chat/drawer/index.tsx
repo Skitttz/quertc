@@ -130,6 +130,7 @@ export function ProfileDrawer({
       </SheetHeader>
 
       <input
+        placeholder="Selecione uma foto"
         ref={fileInputRef}
         type="file"
         accept="image/*"

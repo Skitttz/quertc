@@ -1,3 +1,4 @@
+import { About } from "@/components/landing/about";
 import { CTA } from "@/components/landing/cta";
 import { Features } from "@/components/landing/features";
 import { Hero } from "@/components/landing/hero";
@@ -9,7 +10,7 @@ export default function Home() {
     <PublicContainer>
       <Hero />
       <Features />
-      <CTA />
+      <About />
       <Footer />
     </PublicContainer>
   );

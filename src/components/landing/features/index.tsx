@@ -7,10 +7,16 @@ export function Features() {
   const { container, card, content, iconWrapper, title, description } =
     featuresStyles();
   return (
-    <section
-      className={"px-6 py-8 max-w-7xl mx-auto"}
-      id={LANDING_IDS.FEATURES}
-    >
+    <section className={"px-0 md:px-6 py-6 lg:py-12 max-w-7xl mx-auto"}>
+      <div className="max-w-3xl mb-6 space-y-2" id={LANDING_IDS.FEATURES}>
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+          Da ideia à prática
+        </h2>
+        <p className="text-muted-foreground">
+          Se nossa missão é deixar a conversa brilhar, estes são os recursos que
+          tornam a experiência leve, familiar e confiável.
+        </p>
+      </div>
       <div className={container()}>
         {features.map((feature) => (
           <Card key={feature.title} className={card()}>

@@ -2,6 +2,7 @@
 
 import { ArrowRight, Menu, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Fragment,
   type ReactNode,
@@ -31,6 +32,7 @@ import type { DeviceType, IHeaderRenderProps } from "./types";
 export function Header() {
   const { isMobile, isDesktop } = useMediaQuery();
   const [isSticky, setIsSticky] = useState(false);
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleScroll = useCallback(() => {
@@ -50,6 +52,40 @@ export function Header() {
 
   const handleLinkClick = () => setIsMenuOpen(false);
 
+  const handleEventLink = ({
+    event,
+    link,
+  }: {
+    event: React.MouseEvent<HTMLAnchorElement>;
+    link: (typeof NAVIGATION_LINKS)[number];
+  }) => {
+    if (!link.isInternal) return;
+
+    event.preventDefault();
+
+    const isHome = window.location.pathname === AppRoutesEnum.HOME;
+
+    if (isHome) {
+      const target = document.getElementById(link.href);
+      if (!target) return;
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    } else {
+      router.push(AppRoutesEnum.HOME);
+      setTimeout(() => {
+        const target = document.getElementById(link.href);
+        console.log({ target, link: link.href });
+        if (!target) return;
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 600);
+    }
+  };
+
   const currentDevice: DeviceType = isMobile ? "mobile" : "desktop";
 
   const headerMap: Record<
@@ -65,7 +101,8 @@ export function Header() {
                 <NavigationMenuItem key={link.label}>
                   <NavigationMenuLink asChild>
                     <Link
-                      href={link.href}
+                      href={link.isInternal ? "/" : link.href}
+                      onClick={(event) => handleEventLink({ event, link })}
                       className={navLinkVariants({ variant: "desktop" })}
                     >
                       {link.label}
@@ -82,7 +119,7 @@ export function Header() {
             <Link href={AppRoutesEnum.SIGN_IN}>Entrar</Link>
           </Button>
           <Button variant="default" asChild>
-            <Link href={AppRoutesEnum.SIGN_UP}>Começar grátis</Link>
+            <Link href={AppRoutesEnum.SIGN_UP}>Criar conta</Link>
           </Button>
         </div>
       </Fragment>
@@ -113,8 +150,16 @@ export function Header() {
             {NAVIGATION_LINKS.map((link) => (
               <Link
                 key={link.label}
-                href={link.href}
-                onClick={props.handleLinkClick}
+                href={link.isInternal ? "/" : link.href}
+                onClick={(event) => {
+                  if (!link.isInternal) {
+                    props.handleLinkClick();
+                    return;
+                  }
+                  event.preventDefault();
+                  handleEventLink({ event, link });
+                  props.handleLinkClick();
+                }}
                 className={navLinkVariants({ variant: "mobile" })}
               >
                 {link.label} <ArrowRight className="ml-1 h-4 w-4" />
@@ -142,7 +187,7 @@ export function Header() {
                   href={AppRoutesEnum.SIGN_UP}
                   onClick={props.handleLinkClick}
                 >
-                  Começar grátis
+                  Criar conta
                 </Link>
               </Button>
             </div>

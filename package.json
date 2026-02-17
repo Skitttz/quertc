@@ -24,7 +24,6 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@reduxjs/toolkit": "^2.11.0",
     "@types/mdx": "^2.0.13",
-    "@types/three": "^0.181.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "firebase": "^12.7.0",
@@ -43,7 +42,6 @@
     "remark-html": "^16.0.1",
     "tailwind-merge": "^3.3.1",
     "tailwind-variants": "^3.1.1",
-    "three": "^0.181.0",
     "vaul": "^1.1.2",
     "zod": "^4.1.12"
   },
