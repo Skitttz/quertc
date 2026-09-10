@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { getSocket } from "@/lib/socket-client";
 import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
 import { MarkChatRead } from "@/store/slice/chat";
 import { fetchMessagesByChat } from "@/store/thunks/message";
@@ -25,17 +24,6 @@ export function ChatArea() {
     dispatch(
       MarkChatRead({ chatId: selectedChatId, userId: currentUserData._id }),
     );
-
-    const socket = getSocket();
-    socket?.emit("chat:join", selectedChatId);
-
-    const rejoinOnReconnect = () => socket?.emit("chat:join", selectedChatId);
-    socket?.on("connect", rejoinOnReconnect);
-
-    return () => {
-      socket?.emit("chat:leave", selectedChatId);
-      socket?.off("connect", rejoinOnReconnect);
-    };
   }, [selectedChatId, currentUserData, dispatch]);
 
   if (!selectedChat) {
