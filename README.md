@@ -5,7 +5,7 @@
 O **Quertc** é um aplicativo de **chat web em tempo real**, projetado para oferecer uma experiência leve, divertida e segura de conversas online.
 Com uma interface moderna e intuitiva, ele permite que usuários se conectem instantaneamente, criem salas, troquem mensagens e façam novos amigos — tudo direto do navegador.
 
----
+
 
 ## 🚀 Funcionalidades
 
@@ -14,7 +14,7 @@ Com uma interface moderna e intuitiva, ele permite que usuários se conectem ins
 * 🔒 **Autenticação segura** — login via e-mail, Google ou anônimo.
 * 🎨 **Interface responsiva** — design adaptado para desktop e mobile.
 
----
+
 
 ## 🛠️ Tecnologias Utilizadas
 
