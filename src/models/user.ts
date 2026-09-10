@@ -24,9 +24,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-if (mongoose.models?.users) {
-  mongoose.deleteModel("users");
-}
-
-const UserModel = mongoose.model<IUser>("users", userSchema);
+const UserModel =
+  (mongoose.models?.users as mongoose.Model<IUser>) ??
+  mongoose.model<IUser>("users", userSchema);
 export { UserModel };

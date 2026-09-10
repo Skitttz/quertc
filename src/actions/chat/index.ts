@@ -4,7 +4,11 @@ import { connectToDatabase } from "@/config/database";
 import type { IChat } from "@/interfaces/chat";
 import { ChatModel } from "@/models/chat";
 import { UserModel } from "@/models/user";
-import type { CreateChatResponse, IRequestCreateChat } from "./types";
+import type {
+  CreateChatResponse,
+  IRequestCreateChat,
+  IRequestCreateGroupChat,
+} from "./types";
 
 export const postNewChat = async ({
   payload,
@@ -50,7 +54,7 @@ export const postNewChat = async ({
       return existingChat.toObject();
     }
 
-    const newChat = await ChatModel.create(payload);
+    const newChat = await ChatModel.create({ ...payload, isGroupChat: false });
 
     const populatedChat = await ChatModel.findById(newChat._id)
       .populate("users")
@@ -60,6 +64,66 @@ export const postNewChat = async ({
     return JSON.parse(JSON.stringify(populatedChat));
   } catch (error) {
     console.error("Erro ao criar uma nova conversa:", {
+      error: error instanceof Error ? error.message : "Erro desconhecido",
+      payload,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
+    return null;
+  }
+};
+
+export const postNewGroupChat = async ({
+  payload,
+}: {
+  payload: IRequestCreateGroupChat;
+}): Promise<CreateChatResponse | null> => {
+  try {
+    await connectToDatabase();
+    const clerkUser = await currentUser();
+    if (!clerkUser) {
+      return null;
+    }
+
+    const groupName = payload.groupName?.trim();
+    if (!groupName) {
+      return null;
+    }
+
+    const authUser = await UserModel.findOne({
+      clerkUserId: clerkUser.id,
+    }).lean();
+
+    if (!authUser) {
+      return null;
+    }
+
+    const authUserId = String(authUser._id);
+
+    if (payload.createdBy !== authUserId) {
+      return null;
+    }
+
+    if (!payload.users.includes(authUserId)) {
+      return null;
+    }
+
+    const newChat = await ChatModel.create({
+      users: payload.users,
+      createdBy: authUserId,
+      isGroupChat: true,
+      groupName,
+      groupAdmins: [authUserId],
+    });
+
+    const populatedChat = await ChatModel.findById(newChat._id)
+      .populate("users")
+      .populate("lastMessage")
+      .lean();
+
+    return JSON.parse(JSON.stringify(populatedChat));
+  } catch (error) {
+    console.error("Erro ao criar um novo grupo:", {
       error: error instanceof Error ? error.message : "Erro desconhecido",
       payload,
       stack: error instanceof Error ? error.stack : undefined,

@@ -15,7 +15,6 @@ import type { NewChatListUsersProps } from "./types";
 
 export function NewChatListUsers({
   button,
-  isGroup,
   handleCloseDialog,
 }: NewChatListUsersProps) {
   const [users, setUsers] = useState<IUserWithVirtual[]>([]);
@@ -39,7 +38,6 @@ export function NewChatListUsers({
       const payload: IRequestCreateChat = {
         users: [targetUserId, currentUserData._id],
         createdBy: currentUserData._id,
-        isGroupChat: isGroup,
       };
 
       await createChat(payload);
@@ -61,19 +59,12 @@ export function NewChatListUsers({
           !chat.isGroupChat && chat.users.some((user) => user._id === userId),
       );
 
-    const isUserAlreadyInMyGroup = (userId?: string) =>
-      chats.some(
-        (chat) =>
-          chat.isGroupChat && chat.users.some((user) => user._id === userId),
-      );
-
     return users.filter((user) => {
       if (user._id === currentUserData._id) return false;
-      if (!isGroup && hasPrivateChatWithUser(String(user._id))) return false;
-      if (isGroup && isUserAlreadyInMyGroup(String(user._id))) return false;
+      if (hasPrivateChatWithUser(String(user._id))) return false;
       return true;
     });
-  }, [users, chats, currentUserData, isGroup]);
+  }, [users, chats, currentUserData]);
 
   useEffect(() => {
     async function loadUsers() {
@@ -96,15 +87,7 @@ export function NewChatListUsers({
   }
 
   if (!availableUsers.length) {
-    return (
-      <NewChatListUsersEmpty
-        description={
-          isGroup
-            ? "Parece que não há usuários disponíveis para iniciar um novo grupo."
-            : undefined
-        }
-      />
-    );
+    return <NewChatListUsersEmpty />;
   }
 
   return (

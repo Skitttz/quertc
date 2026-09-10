@@ -1,3 +1,4 @@
+import { NewGroupChatForm } from "../group";
 import { NewChatListUsers } from "../list";
 import type { NewChatDialogVariant } from "./types";
 
@@ -8,7 +9,7 @@ export function AddContactContent({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <NewChatListUsers isGroup={false} handleCloseDialog={handleCloseDialog} />
+      <NewChatListUsers handleCloseDialog={handleCloseDialog} />
     </div>
   );
 }
@@ -22,7 +23,6 @@ export function NewChatContent({
     <div className="flex flex-col gap-4">
       <NewChatListUsers
         handleCloseDialog={handleCloseDialog}
-        isGroup={false}
         button={{ labelAction: "Selecionar" }}
       />
     </div>
@@ -34,15 +34,7 @@ export function NewGroupContent({
 }: {
   handleCloseDialog: () => void;
 }) {
-  return (
-    <div className="flex flex-col gap-4">
-      <NewChatListUsers
-        handleCloseDialog={handleCloseDialog}
-        isGroup={true}
-        button={{ labelAction: "Adicionar" }}
-      />
-    </div>
-  );
+  return <NewGroupChatForm handleCloseDialog={handleCloseDialog} />;
 }
 
 export const newChatContentMap: Record<

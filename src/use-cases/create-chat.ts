@@ -1,7 +1,10 @@
 "use client";
 
-import { postNewChat } from "@/actions/chat";
-import type { IRequestCreateChat } from "@/actions/chat/types";
+import { postNewChat, postNewGroupChat } from "@/actions/chat";
+import type {
+  IRequestCreateChat,
+  IRequestCreateGroupChat,
+} from "@/actions/chat/types";
 import { useAppDispatch } from "@/providers/store/hooks";
 import { AddChat } from "@/store/slice/chat";
 
@@ -17,5 +20,14 @@ export function useChat() {
     return newChat;
   }
 
-  return { createChat };
+  async function createGroupChat(payload: IRequestCreateGroupChat) {
+    const newChat = await postNewGroupChat({ payload });
+    if (!newChat) {
+      return null;
+    }
+    dispatch(AddChat(newChat));
+    return newChat;
+  }
+
+  return { createChat, createGroupChat };
 }

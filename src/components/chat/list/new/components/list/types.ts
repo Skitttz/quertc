@@ -1,5 +1,4 @@
 interface NewChatListUsersProps {
-  isGroup: boolean;
   button?: {
     labelAction?: string;
   };

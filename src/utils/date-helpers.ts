@@ -8,6 +8,13 @@ const formatLongDatePtBr = (date: string) => {
   });
 };
 
+const formatMessageTime = (date: string) => {
+  return new Date(date).toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 const toISOString = (value: DateInput) => {
   if (!value) return "";
 
@@ -25,4 +32,4 @@ const toISOString = (value: DateInput) => {
   return date.toISOString();
 };
 
-export { formatLongDatePtBr, toISOString };
+export { formatLongDatePtBr, formatMessageTime, toISOString };
