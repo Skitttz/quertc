@@ -1,11 +1,15 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { IMessage } from "@/interfaces/message";
-import { connectSocket, getSocket } from "@/lib/socket-client";
+import {
+  connectSocket,
+  disconnectSocket,
+  getSocket,
+} from "@/lib/socket-client";
 import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
-import { SetChatLastMessage } from "@/store/slice/chat";
+import { MarkChatRead, SetChatLastMessage } from "@/store/slice/chat";
 import { AddMessage } from "@/store/slice/message";
 
 type ChatSocketPayload = { chatId: string; message: IMessage };
@@ -16,30 +20,66 @@ export function useChatSocket() {
   const currentUserId = useAppSelector(
     (state) => state.user.currentUserData?._id,
   );
+  const selectedChatId = useAppSelector(
+    (state) => state.message.selectedChatId,
+  );
+
+  const getTokenRef = useRef(getToken);
+  const selectedChatIdRef = useRef(selectedChatId);
 
   useEffect(() => {
-    if (!currentUserId) return;
+    getTokenRef.current = getToken;
+  }, [getToken]);
 
-    let cancelled = false;
+  useEffect(() => {
+    selectedChatIdRef.current = selectedChatId;
+  }, [selectedChatId]);
 
-    const handleNewMessage = (payload: ChatSocketPayload) =>
+  useEffect(() => {
+    if (!currentUserId) {
+      disconnectSocket();
+      return;
+    }
+
+    const socket = connectSocket({ getToken: () => getTokenRef.current() });
+
+    const markReadWhenOpen = (chatId: string) => {
+      if (chatId !== selectedChatIdRef.current) return;
+      dispatch(MarkChatRead({ chatId, userId: currentUserId }));
+    };
+
+    const handleNewMessage = (payload: ChatSocketPayload) => {
       dispatch(AddMessage(payload));
-    const handleChatUpdated = (payload: ChatSocketPayload) =>
+      markReadWhenOpen(payload.chatId);
+    };
+
+    const handleChatUpdated = (payload: ChatSocketPayload) => {
       dispatch(SetChatLastMessage(payload));
+      markReadWhenOpen(payload.chatId);
+    };
 
-    getToken().then((token) => {
-      if (cancelled || !token) return;
-
-      const socket = connectSocket({ token });
-      socket.on("message:new", handleNewMessage);
-      socket.on("chat:updated", handleChatUpdated);
-    });
+    socket.on("message:new", handleNewMessage);
+    socket.on("chat:updated", handleChatUpdated);
 
     return () => {
-      cancelled = true;
-      const socket = getSocket();
-      socket?.off("message:new", handleNewMessage);
-      socket?.off("chat:updated", handleChatUpdated);
+      disconnectSocket();
     };
-  }, [currentUserId, dispatch, getToken]);
+  }, [currentUserId, dispatch]);
+
+  useEffect(() => {
+    if (!currentUserId || !selectedChatId) return;
+
+    const socket = getSocket();
+    if (!socket) return;
+
+    const joinRoom = () => socket.emit("chat:join", selectedChatId);
+
+    joinRoom();
+    socket.on("connect", joinRoom);
+
+    return () => {
+      socket.off("connect", joinRoom);
+      socket.emit("chat:leave", selectedChatId);
+    };
+  }, [currentUserId, selectedChatId]);
 }
