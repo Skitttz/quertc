@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "tsx watch server.ts",
     "build": "next build --turbopack",
-    "start": "next start",
+    "start": "NODE_ENV=production tsx server.ts",
     "lint": "biome check",
     "format": "biome format --write"
   },
