@@ -26,9 +26,7 @@ const messageSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-if (mongoose.models?.messages) {
-  mongoose.deleteModel("messages");
-}
-
-const MessageModel = mongoose.model<IMessage>("messages", messageSchema);
+const MessageModel =
+  (mongoose.models?.messages as mongoose.Model<IMessage>) ??
+  mongoose.model<IMessage>("messages", messageSchema);
 export { MessageModel };

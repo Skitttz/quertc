@@ -43,9 +43,7 @@ const chatSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-if (mongoose.models?.chats) {
-  mongoose.deleteModel("chats");
-}
-
-const ChatModel = mongoose.model<IChat>("chats", chatSchema);
+const ChatModel =
+  (mongoose.models?.chats as mongoose.Model<IChat>) ??
+  mongoose.model<IChat>("chats", chatSchema);
 export { ChatModel };
