@@ -1,7 +1,7 @@
 import type { Server as HTTPServer } from "node:http";
 import { Server } from "socket.io";
-import { ChatModel } from "@/models/chat";
 import { setSocketServer } from "@/lib/socket-server";
+import { ChatModel } from "@/models/chat";
 import { resolveSocketUserId } from "./auth";
 import { chatRoom, userRoom } from "./rooms";
 
@@ -9,17 +9,23 @@ function setupSocketServer(httpServer: HTTPServer): Server {
   const io = new Server(httpServer, { path: "/socket.io" });
 
   io.use(async (socket, next) => {
-    const userId = await resolveSocketUserId({
-      token: socket.handshake.auth?.token,
-    });
+    try {
+      const userId = await resolveSocketUserId({
+        token: socket.handshake.auth?.token,
+      });
 
-    if (!userId) {
-      next(new Error("unauthorized"));
-      return;
+      if (!userId) {
+        console.error("[socket] handshake rejected: unresolved user");
+        next(new Error("forbidden"));
+        return;
+      }
+
+      socket.data.userId = userId;
+      next();
+    } catch (error) {
+      console.error("[socket] handshake failed", error);
+      next(new Error("forbidden"));
     }
-
-    socket.data.userId = userId;
-    next();
   });
 
   io.on("connection", (socket) => {
@@ -27,12 +33,16 @@ function setupSocketServer(httpServer: HTTPServer): Server {
     socket.join(userRoom(userId));
 
     socket.on("chat:join", async (chatId: string) => {
-      const chat = await ChatModel.findOne({
-        _id: chatId,
-        users: { $in: [userId] },
-      }).lean();
+      try {
+        const chat = await ChatModel.findOne({
+          _id: chatId,
+          users: { $in: [userId] },
+        }).lean();
 
-      if (chat) socket.join(chatRoom(chatId));
+        if (chat) socket.join(chatRoom(chatId));
+      } catch (error) {
+        console.error("[socket] chat:join failed", error);
+      }
     });
 
     socket.on("chat:leave", (chatId: string) => {
