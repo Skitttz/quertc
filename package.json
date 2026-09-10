@@ -10,6 +10,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@clerk/backend": "^3.17.1",
     "@clerk/localizations": "^3.26.2",
     "@clerk/nextjs": "^6.33.7",
     "@mdx-js/loader": "^3.1.1",
@@ -40,8 +41,11 @@
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",
     "remark-html": "^16.0.1",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "tailwind-merge": "^3.3.1",
     "tailwind-variants": "^3.1.1",
+    "tsx": "^4.23.13",
     "vaul": "^1.1.2",
     "zod": "^4.1.12"
   },
