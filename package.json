@@ -10,7 +10,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
-    "@clerk/backend": "^3.17.1",
+    "@clerk/backend": "^2.33.6",
     "@clerk/localizations": "^3.26.2",
     "@clerk/nextjs": "^6.33.7",
     "@mdx-js/loader": "^3.1.1",
