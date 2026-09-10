@@ -38,7 +38,21 @@ const messageSlice = createSlice({
       })
       .addCase(fetchMessagesByChat.fulfilled, (state, action) => {
         state.loading = false;
-        state.messagesByChat[action.payload.chatId] = action.payload.messages;
+
+        const { chatId, messages } = action.payload;
+        const merged = new Map<string, IMessage>();
+
+        for (const message of state.messagesByChat[chatId] ?? []) {
+          merged.set(message._id, message);
+        }
+        for (const message of messages) {
+          merged.set(message._id, message);
+        }
+
+        state.messagesByChat[chatId] = [...merged.values()].sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        );
       })
       .addCase(fetchMessagesByChat.rejected, (state) => {
         state.loading = false;
