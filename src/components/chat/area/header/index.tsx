@@ -1,11 +1,10 @@
 import { ArrowLeftIcon } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ZoomableAvatar } from "@/components/chat/avatar-zoom";
 import { Button } from "@/components/ui/button";
 import type { IChat } from "@/interfaces/chat";
 import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
 import { SelectChat } from "@/store/slice/message";
 import { getChatDisplay } from "@/utils/chat-display";
-import { getNameInitials } from "@/utils/text-helpers";
 
 export function ChatAreaHeader({ chat }: { chat: IChat }) {
   const dispatch = useAppDispatch();
@@ -28,19 +27,11 @@ export function ChatAreaHeader({ chat }: { chat: IChat }) {
         <ArrowLeftIcon />
       </Button>
 
-      <Avatar className="size-10 shrink-0">
-        {avatarSrc ? (
-          <AvatarImage
-            src={avatarSrc}
-            alt={`Avatar de ${displayName}`}
-            className="object-cover"
-          />
-        ) : (
-          <AvatarFallback>
-            {getNameInitials({ text: displayName })}
-          </AvatarFallback>
-        )}
-      </Avatar>
+      <ZoomableAvatar
+        className="size-10 shrink-0"
+        name={displayName ?? ""}
+        src={avatarSrc}
+      />
 
       <p className="truncate font-semibold">{displayName}</p>
     </div>
