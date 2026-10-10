@@ -1,6 +1,7 @@
 "use client";
 
 import { type JSX, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
 import type { ChatState } from "@/store/slice/chat";
 import { SelectChat } from "@/store/slice/message";
@@ -33,7 +34,12 @@ export function ChatList() {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div
+      className={cn(
+        "flex min-w-0 flex-col gap-2",
+        selectedChatId && "hidden md:flex",
+      )}
+    >
       <ChatHeaderList title="Minhas conversas" />
       <div className="border h-[76vh] overflow-y-auto rounded-sm">
         <div className="flex flex-col gap-2 p-2">

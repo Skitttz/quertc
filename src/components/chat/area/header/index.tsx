@@ -1,10 +1,14 @@
+import { ArrowLeftIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import type { IChat } from "@/interfaces/chat";
-import { useAppSelector } from "@/providers/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
+import { SelectChat } from "@/store/slice/message";
 import { getChatDisplay } from "@/utils/chat-display";
 import { getNameInitials } from "@/utils/text-helpers";
 
 export function ChatAreaHeader({ chat }: { chat: IChat }) {
+  const dispatch = useAppDispatch();
   const { currentUserData } = useAppSelector((state) => state.user);
 
   const { avatarSrc, displayName } = getChatDisplay({
@@ -14,6 +18,16 @@ export function ChatAreaHeader({ chat }: { chat: IChat }) {
 
   return (
     <div className="flex items-center gap-3 border-b p-3">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden"
+        aria-label="Voltar para as conversas"
+        onClick={() => dispatch(SelectChat(null))}
+      >
+        <ArrowLeftIcon />
+      </Button>
+
       <Avatar className="size-10 shrink-0">
         {avatarSrc ? (
           <AvatarImage
@@ -28,7 +42,7 @@ export function ChatAreaHeader({ chat }: { chat: IChat }) {
         )}
       </Avatar>
 
-      <p className="font-semibold">{displayName}</p>
+      <p className="truncate font-semibold">{displayName}</p>
     </div>
   );
 }
