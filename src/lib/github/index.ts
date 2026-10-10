@@ -1,6 +1,8 @@
 import { generateSlug } from "@/utils/generate-slug";
 import type { GitHubIssue } from "./types";
 
+const BLOG_LABEL = "blog";
+
 async function fetchGitHub(endpoint: string) {
   const headers: HeadersInit = {
     Accept: "application/vnd.github.v3+json",
@@ -31,7 +33,16 @@ async function fetchGitHub(endpoint: string) {
 }
 
 export async function getAllPosts(): Promise<GitHubIssue[]> {
-  return fetchGitHub("/issues?state=open&sort=created&direction=desc");
+  const issues: GitHubIssue[] = await fetchGitHub(
+    `/issues?state=open&labels=${BLOG_LABEL}&sort=created&direction=desc`,
+  );
+
+  return issues
+    .filter((issue) => !issue.pull_request)
+    .map((issue) => ({
+      ...issue,
+      labels: issue.labels.filter((label) => label.name !== BLOG_LABEL),
+    }));
 }
 
 export function extractFirstImage(body: string): string | null {

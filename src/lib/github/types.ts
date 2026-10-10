@@ -16,4 +16,5 @@ export interface GitHubIssue {
     color: string;
   }>;
   comments: number;
+  pull_request?: object;
 }
