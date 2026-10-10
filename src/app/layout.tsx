@@ -4,6 +4,7 @@ import "./globals.css";
 import { ptBR } from "@clerk/localizations";
 import { ClerkProvider } from "@clerk/nextjs";
 import { connectToDatabase } from "@/config/database";
+import { AppRoutesEnum } from "@/shared/route";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={ptBR}>
+    <ClerkProvider
+      localization={ptBR}
+      signInUrl={AppRoutesEnum.SIGN_IN}
+      signUpUrl={AppRoutesEnum.SIGN_UP}
+      signInFallbackRedirectUrl={AppRoutesEnum.CHAT}
+      signUpFallbackRedirectUrl={AppRoutesEnum.CHAT}
+    >
       <html lang="pt-BR">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
