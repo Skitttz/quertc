@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { MDXContent } from "@/components/blog/mdx";
 import { PublicContainer } from "@/components/public/PublicContainer";
-import { getAllPosts } from "@/lib/github";
+import { getAllPosts, getPostPreviewSimple } from "@/lib/github";
 import { AppRoutesEnum } from "@/shared/route";
 import { formatLongDatePtBr } from "@/utils/date-helpers";
 import { generateSlug } from "@/utils/generate-slug";
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
 
   return {
     title: post.title,
-    description: post.body.substring(0, 160),
+    description: getPostPreviewSimple(post.body, 160),
   };
 }
 

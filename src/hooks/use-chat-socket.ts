@@ -2,6 +2,7 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { useEffect, useRef } from "react";
+import type { IChat } from "@/interfaces/chat";
 import type { IMessage } from "@/interfaces/message";
 import {
   connectSocket,
@@ -9,7 +10,7 @@ import {
   getSocket,
 } from "@/lib/socket-client";
 import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
-import { MarkChatRead, SetChatLastMessage } from "@/store/slice/chat";
+import { AddChat, MarkChatRead, SetChatLastMessage } from "@/store/slice/chat";
 import { AddMessage } from "@/store/slice/message";
 
 type ChatSocketPayload = { chatId: string; message: IMessage };
@@ -58,7 +59,12 @@ export function useChatSocket() {
       markReadWhenOpen(payload.chatId);
     };
 
+    const handleChatCreated = ({ chat }: { chat: IChat }) => {
+      dispatch(AddChat(chat));
+    };
+
     socket.on("message:new", handleNewMessage);
+    socket.on("chat:created", handleChatCreated);
     socket.on("chat:updated", handleChatUpdated);
 
     return () => {

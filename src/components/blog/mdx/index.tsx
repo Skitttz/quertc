@@ -1,3 +1,4 @@
+import type { MDXComponents } from "mdx/types";
 import Image from "next/image";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type React from "react";
@@ -5,13 +6,10 @@ import type { ReactNode } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import remarkGfm from "remark-gfm";
-import type { MDXComponents, MDXContentProps } from "./types";
+import type { MDXContentProps } from "./types";
 
 const components: MDXComponents = {
-  h1: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }) => (
+  h1: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1
       {...props}
       className="text-4xl font-bold mt-8 mb-4 text-gray-900 scroll-mt-20"
@@ -19,10 +17,7 @@ const components: MDXComponents = {
       {children}
     </h1>
   ),
-  h2: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }) => (
+  h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
       {...props}
       className="text-3xl font-bold mt-8 mb-4 text-gray-900 scroll-mt-20"
@@ -30,10 +25,7 @@ const components: MDXComponents = {
       {children}
     </h2>
   ),
-  h3: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }) => (
+  h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
       {...props}
       className="text-2xl font-bold mt-6 mb-3 text-gray-900 scroll-mt-20"
@@ -41,10 +33,7 @@ const components: MDXComponents = {
       {children}
     </h3>
   ),
-  h4: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }) => (
+  h4: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h4
       {...props}
       className="text-xl font-bold mt-6 mb-3 text-gray-900 scroll-mt-20"
@@ -52,10 +41,7 @@ const components: MDXComponents = {
       {children}
     </h4>
   ),
-  p: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLParagraphElement> & { children: ReactNode }) => (
+  p: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p {...props} className="mb-4 leading-relaxed text-gray-700 text-justify">
       {children}
     </p>
@@ -64,9 +50,7 @@ const components: MDXComponents = {
     href,
     children,
     ...props
-  }: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-    children: ReactNode;
-  }) => (
+  }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
       href={href}
       target="_blank"
@@ -109,7 +93,7 @@ const components: MDXComponents = {
     className,
     ...props
   }: {
-    children: ReactNode;
+    children?: ReactNode;
     className?: string;
   }) => {
     const match = /language-(\w+)/.exec(className || "");
@@ -140,18 +124,12 @@ const components: MDXComponents = {
       </div>
     );
   },
-  pre: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLDivElement> & { children: ReactNode }) => (
+  pre: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
     <div {...props} className="not-prose my-6">
       {children}
     </div>
   ),
-  ul: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLUListElement> & { children: ReactNode }) => (
+  ul: ({ children, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
       {...props}
       className="list-disc list-inside mb-4 space-y-2 text-gray-700 ml-4"
@@ -159,10 +137,7 @@ const components: MDXComponents = {
       {children}
     </ul>
   ),
-  ol: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLOListElement> & { children: ReactNode }) => (
+  ol: ({ children, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
     <ol
       {...props}
       className="list-decimal list-inside mb-4 space-y-2 text-gray-700 ml-4"
@@ -170,18 +145,12 @@ const components: MDXComponents = {
       {children}
     </ol>
   ),
-  li: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLLIElement> & { children: ReactNode }) => (
+  li: ({ children, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
     <li {...props} className="leading-relaxed">
       {children}
     </li>
   ),
-  blockquote: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLElement> & { children: ReactNode }) => (
+  blockquote: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <blockquote
       {...props}
       className="border-l-4 border-blue-500 pl-4 my-6 italic text-gray-600 bg-blue-50 py-4 rounded-r-lg"
@@ -192,7 +161,7 @@ const components: MDXComponents = {
   table: ({
     children,
     ...props
-  }: React.TableHTMLAttributes<HTMLTableElement> & { children: ReactNode }) => (
+  }: React.TableHTMLAttributes<HTMLTableElement>) => (
     <div className="overflow-x-auto my-6">
       <table
         {...props}
@@ -205,9 +174,7 @@ const components: MDXComponents = {
   thead: ({
     children,
     ...props
-  }: React.HTMLAttributes<HTMLTableSectionElement> & {
-    children: ReactNode;
-  }) => (
+  }: React.HTMLAttributes<HTMLTableSectionElement>) => (
     <thead {...props} className="bg-gray-100">
       {children}
     </thead>
@@ -215,13 +182,10 @@ const components: MDXComponents = {
   tbody: ({
     children,
     ...props
-  }: React.HTMLAttributes<HTMLTableSectionElement> & {
-    children: ReactNode;
-  }) => <tbody {...props}>{children}</tbody>,
-  tr: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLTableRowElement> & { children: ReactNode }) => (
+  }: React.HTMLAttributes<HTMLTableSectionElement>) => (
+    <tbody {...props}>{children}</tbody>
+  ),
+  tr: ({ children, ...props }: React.HTMLAttributes<HTMLTableRowElement>) => (
     <tr
       {...props}
       className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
@@ -232,9 +196,7 @@ const components: MDXComponents = {
   th: ({
     children,
     ...props
-  }: React.ThHTMLAttributes<HTMLTableCellElement> & {
-    children: ReactNode;
-  }) => (
+  }: React.ThHTMLAttributes<HTMLTableCellElement>) => (
     <th
       {...props}
       className="px-4 py-3 text-left text-sm font-semibold text-gray-900"
@@ -245,9 +207,7 @@ const components: MDXComponents = {
   td: ({
     children,
     ...props
-  }: React.TdHTMLAttributes<HTMLTableCellElement> & {
-    children: ReactNode;
-  }) => (
+  }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
     <td {...props} className="px-4 py-3 text-sm text-gray-700">
       {children}
     </td>
@@ -255,18 +215,12 @@ const components: MDXComponents = {
   hr: (props: React.HTMLAttributes<HTMLHRElement>) => (
     <hr {...props} className="my-8 border-gray-300" />
   ),
-  strong: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLElement> & { children: ReactNode }) => (
+  strong: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <strong {...props} className="font-bold text-gray-900">
       {children}
     </strong>
   ),
-  em: ({
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLElement> & { children: ReactNode }) => (
+  em: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <em {...props} className="italic text-gray-700">
       {children}
     </em>

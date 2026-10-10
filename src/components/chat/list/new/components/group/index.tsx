@@ -23,24 +23,13 @@ export function NewGroupChatForm({
   const [creating, setCreating] = useState(false);
 
   const { currentUserData } = useAppSelector((state) => state.user);
-  const { chats } = useAppSelector((state) => state.chat);
   const { createGroupChat } = useChat();
 
   const availableUsers = useMemo(() => {
     if (!currentUserData?._id) return [];
 
-    const isUserAlreadyInMyGroup = (userId: string) =>
-      chats.some(
-        (chat) =>
-          chat.isGroupChat && chat.users.some((user) => user._id === userId),
-      );
-
-    return users.filter((user) => {
-      if (user._id === currentUserData._id) return false;
-      if (isUserAlreadyInMyGroup(String(user._id))) return false;
-      return true;
-    });
-  }, [users, chats, currentUserData]);
+    return users.filter((user) => user._id !== currentUserData._id);
+  }, [users, currentUserData]);
 
   useEffect(() => {
     async function loadUsers() {
@@ -68,6 +57,7 @@ export function NewGroupChatForm({
 
   const handleCreateGroup = async () => {
     if (!currentUserData?._id || !groupName.trim()) return;
+    if (!selectedUserIds.length) return;
 
     setCreating(true);
     const newChat = await createGroupChat({
@@ -107,7 +97,7 @@ export function NewGroupChatForm({
 
       <Button
         loading={creating}
-        disabled={!groupName.trim()}
+        disabled={!groupName.trim() || !selectedUserIds.length}
         onClick={handleCreateGroup}
       >
         Criar grupo

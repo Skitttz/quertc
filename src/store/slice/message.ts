@@ -18,7 +18,7 @@ const messageSlice = createSlice({
   name: "message",
   initialState,
   reducers: {
-    SelectChat: (state, action: PayloadAction<string>) => {
+    SelectChat: (state, action: PayloadAction<string | null>) => {
       state.selectedChatId = action.payload;
     },
     AddMessage: (

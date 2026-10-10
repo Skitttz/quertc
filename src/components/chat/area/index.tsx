@@ -27,11 +27,15 @@ export function ChatArea() {
   }, [selectedChatId, currentUserData, dispatch]);
 
   if (!selectedChat) {
-    return <ChatAreaEmpty />;
+    return (
+      <div className="hidden h-full md:block">
+        <ChatAreaEmpty />
+      </div>
+    );
   }
 
   return (
-    <div className="flex h-[85vh] flex-col rounded-sm border">
+    <div className="flex h-[85vh] min-w-0 flex-col rounded-sm border">
       <ChatAreaHeader chat={selectedChat} />
       <ChatMessages chatId={selectedChat._id} />
       <ChatMessageInput chatId={selectedChat._id} />
