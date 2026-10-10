@@ -61,15 +61,15 @@ export function MessageSearchItem({
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex items-baseline justify-between gap-2">
           <p className="truncate font-semibold">{displayName}</p>
-          <span className="shrink-0 text-xs text-gray-500">
+          <span className="shrink-0 text-xs text-muted-foreground">
             {formatMessageDate(message.createdAt)}
           </span>
         </div>
 
-        <span className="truncate text-sm text-gray-500">
+        <span className="truncate text-sm text-muted-foreground">
           {showSender && senderLabel && `${senderLabel}: `}
           {before}
-          <mark className="rounded-xs bg-blue-100 font-medium text-gray-900">
+          <mark className="rounded-xs bg-primary/15 font-medium text-foreground">
             {match}
           </mark>
           {after}

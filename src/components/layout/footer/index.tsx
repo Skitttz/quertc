@@ -6,8 +6,8 @@ export function Footer() {
   return (
     <footer>
       <div className="max-w-7xl mx-auto px-0 md:px-6 py-14">
-        <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
-          <p className="text-gray-700">
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
+          <p className="text-foreground">
             © {currentYear} quertc. Todos os direitos reservados.
           </p>
           <nav aria-label="Links de apoio">

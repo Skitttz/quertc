@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useAppSelector } from "@/providers/store/hooks";
 import { AppRoutesEnum } from "@/shared/route";
 import { SCROLL_THRESHOLD } from "./constants";
@@ -83,12 +84,16 @@ export function Header() {
           <Logo className="h-6 w-auto md:mr-48" />
         </Link>
 
-        <div className="hidden md:flex">
-          <UserMenu {...userMenuProps} variant="desktop" />
-        </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
 
-        <div className="flex md:hidden">
-          <UserMenu {...userMenuProps} variant="mobile" />
+          <div className="hidden md:flex">
+            <UserMenu {...userMenuProps} variant="desktop" />
+          </div>
+
+          <div className="flex md:hidden">
+            <UserMenu {...userMenuProps} variant="mobile" />
+          </div>
         </div>
       </div>
     </header>

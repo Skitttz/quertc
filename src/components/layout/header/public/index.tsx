@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -86,8 +87,6 @@ export function Header() {
     }
   };
 
-  const currentDevice: DeviceType = isMobile ? "mobile" : "desktop";
-
   const headerMap: Record<
     DeviceType,
     (props: IHeaderRenderProps) => ReactNode
@@ -115,6 +114,7 @@ export function Header() {
         </nav>
 
         <div className="flex gap-3 flex-shrink-0">
+          <ThemeToggle />
           <Button variant="ghost" asChild>
             <Link href={AppRoutesEnum.SIGN_IN}>Entrar</Link>
           </Button>
@@ -165,7 +165,7 @@ export function Header() {
                 {link.label} <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             ))}
-            <div className="flex flex-col gap-3 bg-gray-50 py-4 px-3 border-b overflow-hidden">
+            <div className="flex flex-col gap-3 bg-muted py-4 px-3 border-b overflow-hidden">
               <Button
                 variant="ghost"
                 asChild
@@ -211,7 +211,14 @@ export function Header() {
           <Logo className="h-6 w-auto md:mr-48" />
         </Link>
 
-        {headerMap[currentDevice](renderProps)}
+        {isMobile ? (
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            {headerMap.mobile(renderProps)}
+          </div>
+        ) : (
+          headerMap.desktop(renderProps)
+        )}
       </div>
     </header>
   );

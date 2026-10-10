@@ -22,7 +22,7 @@ export function ChatHeaderList({
         aria-label="Buscar conversa"
         value={search}
         onChange={(event) => onSearchChange(event.target.value)}
-        icon={<TextSearchIcon className="text-blue-900" size={21} />}
+        icon={<TextSearchIcon className="text-primary" size={21} />}
         className="w-full py-4 rounded-sm transition-all indent-1"
         placeholder="Buscar conversa"
       />

@@ -10,7 +10,7 @@ export function LinkScrollTo({ label, isRedirect, href }: LinkLandingProps) {
       onClick={(event) => {
         isRedirect ? null : scrollTo(event, href);
       }}
-      className="text-gray-700 hover:text-blue-400 focus-visible:outline focus-visible:outline-blue-400 transition"
+      className="text-foreground hover:text-blue-400 focus-visible:outline focus-visible:outline-blue-400 transition"
     >
       {label}
     </Link>
