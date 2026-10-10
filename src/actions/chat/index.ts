@@ -2,6 +2,8 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { connectToDatabase } from "@/config/database";
 import type { IChat } from "@/interfaces/chat";
+import { userRoom } from "@/lib/socket/rooms";
+import { getSocketServer } from "@/lib/socket-server";
 import { ChatModel } from "@/models/chat";
 import { UserModel } from "@/models/user";
 import type {
@@ -9,6 +11,15 @@ import type {
   IRequestCreateChat,
   IRequestCreateGroupChat,
 } from "./types";
+
+function emitChatCreated({ chat }: { chat: IChat }) {
+  const io = getSocketServer();
+  if (!io) return;
+
+  for (const user of chat.users) {
+    io.to(userRoom(String(user._id))).emit("chat:created", { chat });
+  }
+}
 
 export const postNewChat = async ({
   payload,
@@ -61,7 +72,10 @@ export const postNewChat = async ({
       .populate("lastMessage")
       .lean();
 
-    return JSON.parse(JSON.stringify(populatedChat));
+    const serializedChat = JSON.parse(JSON.stringify(populatedChat));
+    emitChatCreated({ chat: serializedChat });
+
+    return serializedChat;
   } catch (error) {
     console.error("Erro ao criar uma nova conversa:", {
       error: error instanceof Error ? error.message : "Erro desconhecido",
@@ -121,7 +135,10 @@ export const postNewGroupChat = async ({
       .populate("lastMessage")
       .lean();
 
-    return JSON.parse(JSON.stringify(populatedChat));
+    const serializedChat = JSON.parse(JSON.stringify(populatedChat));
+    emitChatCreated({ chat: serializedChat });
+
+    return serializedChat;
   } catch (error) {
     console.error("Erro ao criar um novo grupo:", {
       error: error instanceof Error ? error.message : "Erro desconhecido",

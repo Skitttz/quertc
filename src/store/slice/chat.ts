@@ -20,7 +20,8 @@ const chatSlice = createSlice({
     SetChats: (state, action) => {
       state.chats = action.payload;
     },
-    AddChat: (state, action) => {
+    AddChat: (state, action: PayloadAction<IChat>) => {
+      if (state.chats.some((chat) => chat._id === action.payload._id)) return;
       state.chats.unshift(action.payload);
     },
     SetChatLastMessage: (
