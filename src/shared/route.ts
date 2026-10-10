@@ -8,10 +8,14 @@ enum AppRoutesEnum {
   CHAT = "/chat",
 }
 
-export const AppPublicRoutes = [
-  AppRoutesEnum.HOME,
+export const AppAuthRoutes = [
   toRoutePattern(AppRoutesEnum.SIGN_IN),
   toRoutePattern(AppRoutesEnum.SIGN_UP),
+];
+
+export const AppPublicRoutes = [
+  AppRoutesEnum.HOME,
+  ...AppAuthRoutes,
   toRoutePattern(AppRoutesEnum.BLOG),
 ];
 

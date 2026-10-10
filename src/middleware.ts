@@ -1,11 +1,20 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { AppPublicRoutes, AppRoutesEnum } from "./shared/route";
+import { AppAuthRoutes, AppPublicRoutes, AppRoutesEnum } from "./shared/route";
 
 const isPublicRoute = createRouteMatcher(AppPublicRoutes);
+const isAuthRoute = createRouteMatcher(AppAuthRoutes);
 
 export default clerkMiddleware(
   async (auth, req) => {
+    if (isAuthRoute(req)) {
+      const { userId } = await auth();
+      if (userId) {
+        return NextResponse.redirect(new URL(AppRoutesEnum.CHAT, req.url));
+      }
+      return;
+    }
+
     if (!isPublicRoute(req)) {
       await auth.protect();
       return NextResponse.next();
