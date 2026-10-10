@@ -9,15 +9,15 @@ export const features = [
     icon: <MessageCircle className={featuresStyles().icon()} />,
   },
   {
-    title: "Salas e Grupos",
+    title: "Conversas e Grupos",
     description:
-      "Crie salas públicas ou privadas para diferentes assuntos. Junte sua galera e mantenha as conversas organizadas.",
+      "Converse em privado ou crie um grupo com várias pessoas. Junte sua galera e mantenha as conversas organizadas.",
     icon: <Users className={featuresStyles().icon()} />,
   },
   {
-    title: "Notificações Inteligentes",
+    title: "Mensagens Não Lidas",
     description:
-      "Receba alertas apenas quando alguém falar com você. Nada de barulho o tempo todo — só o que importa.",
+      "Veja a última mensagem de cada conversa e saiba na hora quais você ainda não leu.",
     icon: <Bell className={featuresStyles().icon()} />,
   },
 ];
