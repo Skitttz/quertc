@@ -57,6 +57,7 @@ export function NewGroupChatForm({
 
   const handleCreateGroup = async () => {
     if (!currentUserData?._id || !groupName.trim()) return;
+    if (!selectedUserIds.length) return;
 
     setCreating(true);
     const newChat = await createGroupChat({
@@ -96,7 +97,7 @@ export function NewGroupChatForm({
 
       <Button
         loading={creating}
-        disabled={!groupName.trim()}
+        disabled={!groupName.trim() || !selectedUserIds.length}
         onClick={handleCreateGroup}
       >
         Criar grupo

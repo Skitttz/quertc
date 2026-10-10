@@ -118,12 +118,14 @@ export const postNewGroupChat = async ({
       return null;
     }
 
-    if (!payload.users.includes(authUserId)) {
+    const participantIds = [...new Set(payload.users)];
+
+    if (!participantIds.includes(authUserId) || participantIds.length < 2) {
       return null;
     }
 
     const newChat = await ChatModel.create({
-      users: payload.users,
+      users: participantIds,
       createdBy: authUserId,
       isGroupChat: true,
       groupName,
