@@ -7,6 +7,12 @@ import { getSocketServer } from "@/lib/socket-server";
 import { ChatModel } from "@/models/chat";
 import { MessageModel } from "@/models/message";
 import { UserModel } from "@/models/user";
+import { toAccentInsensitivePattern } from "@/utils/search-helpers";
+import {
+  MESSAGE_SEARCH_LIMIT,
+  MESSAGE_SEARCH_MAX_LENGTH,
+  MESSAGE_SEARCH_MIN_LENGTH,
+} from "./constants";
 import type { IRequestSendMessage, SendMessageResponse } from "./types";
 
 async function getAuthenticatedChatMember({ chatId }: { chatId: string }) {
@@ -111,5 +117,46 @@ export const postNewMessage = async ({
   } catch (error) {
     console.error("Erro ao enviar mensagem:", error);
     return null;
+  }
+};
+
+export const searchMessages = async ({
+  query,
+}: {
+  query: string;
+}): Promise<IMessage[]> => {
+  const term =
+    typeof query === "string"
+      ? query.trim().slice(0, MESSAGE_SEARCH_MAX_LENGTH)
+      : "";
+  if (term.length < MESSAGE_SEARCH_MIN_LENGTH) return [];
+
+  try {
+    await connectToDatabase();
+
+    const clerkUser = await currentUser();
+    if (!clerkUser) return [];
+
+    const authUser = await UserModel.findOne({
+      clerkUserId: clerkUser.id,
+    }).lean();
+    if (!authUser) return [];
+
+    const chatIds = await ChatModel.find({
+      users: { $in: [String(authUser._id)] },
+    }).distinct("_id");
+
+    const messages = await MessageModel.find({
+      chat: { $in: chatIds },
+      text: { $regex: toAccentInsensitivePattern(term), $options: "i" },
+    })
+      .sort({ createdAt: -1 })
+      .limit(MESSAGE_SEARCH_LIMIT)
+      .lean<IMessage[]>();
+
+    return JSON.parse(JSON.stringify(messages));
+  } catch (error) {
+    console.error("Erro ao buscar mensagens:", error);
+    return [];
   }
 };
