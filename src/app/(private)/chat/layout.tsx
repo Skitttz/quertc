@@ -19,7 +19,7 @@ export default async function PrivateRootLayout({
 
   return (
     <StoreProvider user={safeUser}>
-      <div className="mx-auto flex flex-col max-w-6xl">
+      <div className="mx-auto flex h-dvh max-w-6xl flex-col">
         <Header />
         {children}
       </div>

@@ -21,7 +21,7 @@ export function NewChatDropdown() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex gap-2">
+          <Button variant="ghost" size="icon" aria-label="Nova conversa">
             <MessageCirclePlusIcon className="size-5" />
           </Button>
         </DropdownMenuTrigger>
