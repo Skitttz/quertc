@@ -59,10 +59,13 @@ export const postNewChat = async ({
     const existingChat = await ChatModel.findOne({
       isGroupChat: false,
       users: { $all: [userA, userB] },
-    }).populate("users");
+    })
+      .populate("users")
+      .populate("lastMessage")
+      .lean();
 
     if (existingChat) {
-      return existingChat.toObject();
+      return JSON.parse(JSON.stringify(existingChat));
     }
 
     const newChat = await ChatModel.create({ ...payload, isGroupChat: false });
