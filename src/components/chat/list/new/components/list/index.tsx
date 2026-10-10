@@ -91,7 +91,7 @@ export function NewChatListUsers({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="max-h-[55vh] space-y-2 overflow-y-auto">
       {availableUsers.map((user) => (
         <div
           key={user.email}

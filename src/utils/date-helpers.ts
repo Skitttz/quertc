@@ -15,6 +15,19 @@ const formatMessageTime = (date: string) => {
   });
 };
 
+const formatMessageDate = (date: string) => {
+  const value = new Date(date);
+  const isToday = value.toDateString() === new Date().toDateString();
+
+  return isToday
+    ? formatMessageTime(date)
+    : value.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+      });
+};
+
 const toISOString = (value: DateInput) => {
   if (!value) return "";
 
@@ -32,4 +45,9 @@ const toISOString = (value: DateInput) => {
   return date.toISOString();
 };
 
-export { formatLongDatePtBr, formatMessageTime, toISOString };
+export {
+  formatLongDatePtBr,
+  formatMessageDate,
+  formatMessageTime,
+  toISOString,
+};

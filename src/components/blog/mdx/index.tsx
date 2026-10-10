@@ -12,7 +12,7 @@ const components: MDXComponents = {
   h1: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1
       {...props}
-      className="text-4xl font-bold mt-8 mb-4 text-gray-900 scroll-mt-20"
+      className="text-4xl font-bold mt-8 mb-4 text-foreground scroll-mt-20"
     >
       {children}
     </h1>
@@ -20,7 +20,7 @@ const components: MDXComponents = {
   h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
       {...props}
-      className="text-3xl font-bold mt-8 mb-4 text-gray-900 scroll-mt-20"
+      className="text-3xl font-bold mt-8 mb-4 text-foreground scroll-mt-20"
     >
       {children}
     </h2>
@@ -28,7 +28,7 @@ const components: MDXComponents = {
   h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
       {...props}
-      className="text-2xl font-bold mt-6 mb-3 text-gray-900 scroll-mt-20"
+      className="text-2xl font-bold mt-6 mb-3 text-foreground scroll-mt-20"
     >
       {children}
     </h3>
@@ -36,13 +36,13 @@ const components: MDXComponents = {
   h4: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h4
       {...props}
-      className="text-xl font-bold mt-6 mb-3 text-gray-900 scroll-mt-20"
+      className="text-xl font-bold mt-6 mb-3 text-foreground scroll-mt-20"
     >
       {children}
     </h4>
   ),
   p: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p {...props} className="mb-4 leading-relaxed text-gray-700 text-justify">
+    <p {...props} className="mb-4 leading-relaxed text-foreground text-justify">
       {children}
     </p>
   ),
@@ -56,7 +56,7 @@ const components: MDXComponents = {
       target="_blank"
       rel="noopener noreferrer"
       {...props}
-      className="text-blue-600 hover:text-blue-800 underline decoration-blue-300 hover:decoration-blue-500 transition-colors"
+      className="text-primary hover:text-primary/80 underline decoration-primary/40 hover:decoration-primary transition-colors"
     >
       {children}
     </a>
@@ -81,7 +81,7 @@ const components: MDXComponents = {
           {...props}
         />
         {alt && (
-          <span className="block text-center text-sm text-gray-500 mt-2 italic">
+          <span className="block text-center text-sm text-muted-foreground mt-2 italic">
             {alt}
           </span>
         )}
@@ -103,7 +103,7 @@ const components: MDXComponents = {
     if (isInline) {
       return (
         <code
-          className="px-2 py-1 bg-gray-100 text-red-600 rounded text-sm font-mono"
+          className="px-2 py-1 bg-muted text-red-600 dark:text-red-400 rounded text-sm font-mono"
           {...props}
         >
           {children}
@@ -132,7 +132,7 @@ const components: MDXComponents = {
   ul: ({ children, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
       {...props}
-      className="list-disc list-inside mb-4 space-y-2 text-gray-700 ml-4"
+      className="list-disc list-inside mb-4 space-y-2 text-foreground ml-4"
     >
       {children}
     </ul>
@@ -140,7 +140,7 @@ const components: MDXComponents = {
   ol: ({ children, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
     <ol
       {...props}
-      className="list-decimal list-inside mb-4 space-y-2 text-gray-700 ml-4"
+      className="list-decimal list-inside mb-4 space-y-2 text-foreground ml-4"
     >
       {children}
     </ol>
@@ -153,7 +153,7 @@ const components: MDXComponents = {
   blockquote: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <blockquote
       {...props}
-      className="border-l-4 border-blue-500 pl-4 my-6 italic text-gray-600 bg-blue-50 py-4 rounded-r-lg"
+      className="border-l-4 border-primary pl-4 my-6 italic text-muted-foreground bg-primary/5 py-4 rounded-r-lg"
     >
       {children}
     </blockquote>
@@ -165,7 +165,7 @@ const components: MDXComponents = {
     <div className="overflow-x-auto my-6">
       <table
         {...props}
-        className="min-w-full border border-gray-200 rounded-lg overflow-hidden"
+        className="min-w-full border border-border rounded-lg overflow-hidden"
       >
         {children}
       </table>
@@ -175,7 +175,7 @@ const components: MDXComponents = {
     children,
     ...props
   }: React.HTMLAttributes<HTMLTableSectionElement>) => (
-    <thead {...props} className="bg-gray-100">
+    <thead {...props} className="bg-muted">
       {children}
     </thead>
   ),
@@ -188,7 +188,7 @@ const components: MDXComponents = {
   tr: ({ children, ...props }: React.HTMLAttributes<HTMLTableRowElement>) => (
     <tr
       {...props}
-      className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+      className="border-b border-border hover:bg-accent transition-colors"
     >
       {children}
     </tr>
@@ -199,7 +199,7 @@ const components: MDXComponents = {
   }: React.ThHTMLAttributes<HTMLTableCellElement>) => (
     <th
       {...props}
-      className="px-4 py-3 text-left text-sm font-semibold text-gray-900"
+      className="px-4 py-3 text-left text-sm font-semibold text-foreground"
     >
       {children}
     </th>
@@ -208,20 +208,20 @@ const components: MDXComponents = {
     children,
     ...props
   }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
-    <td {...props} className="px-4 py-3 text-sm text-gray-700">
+    <td {...props} className="px-4 py-3 text-sm text-foreground">
       {children}
     </td>
   ),
   hr: (props: React.HTMLAttributes<HTMLHRElement>) => (
-    <hr {...props} className="my-8 border-gray-300" />
+    <hr {...props} className="my-8 border-border" />
   ),
   strong: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <strong {...props} className="font-bold text-gray-900">
+    <strong {...props} className="font-bold text-foreground">
       {children}
     </strong>
   ),
   em: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <em {...props} className="italic text-gray-700">
+    <em {...props} className="italic text-foreground">
       {children}
     </em>
   ),

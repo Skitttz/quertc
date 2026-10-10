@@ -60,18 +60,20 @@ export function ChatItem({
         {lastMessage ? (
           <span
             className={`truncate text-sm ${
-              hasUnreadMessage ? "font-medium text-gray-900" : "text-gray-500"
+              hasUnreadMessage
+                ? "font-medium text-foreground"
+                : "text-muted-foreground"
             }`}
           >
             {lastMessage.text}
           </span>
         ) : (
-          <span className="text-sm text-gray-400"></span>
+          <span className="text-sm text-muted-foreground"></span>
         )}
       </div>
 
       {hasUnreadMessage && (
-        <span className="ml-auto size-2 rounded-full bg-blue-500" />
+        <span className="ml-auto size-2 rounded-full bg-primary" />
       )}
     </button>
   );

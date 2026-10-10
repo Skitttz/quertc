@@ -57,7 +57,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Link
           href={AppRoutesEnum.BLOG}
-          className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-8 group"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8 group"
         >
           <ArrowLeft
             size={20}
@@ -86,13 +86,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
           )}
 
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
             {post.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 pt-4 border-t border-gray-200">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pt-4 border-t border-border">
             <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-blue-500" />
+              <Calendar size={16} className="text-primary" />
               <span>{formatLongDatePtBr(post.created_at)}</span>
             </div>
 

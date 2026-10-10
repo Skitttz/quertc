@@ -29,7 +29,7 @@ export function HeroAction() {
           onClick={() => push(AppRoutesEnum.SIGN_UP)}
           size="lg"
           variant="default"
-          className="hover:bg-blue-800 shadow-md transition-all duration-200"
+          className="hover:bg-primary/90 shadow-md transition-all duration-200"
         >
           Experimente agora
         </Button>

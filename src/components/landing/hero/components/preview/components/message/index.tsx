@@ -7,7 +7,9 @@ type Props = {
 export function MessageBubble({ message }: Props) {
   const align = message.received ? "justify-start" : "justify-end";
   const corner = message.received ? "rounded-bl-sm" : "rounded-br-sm";
-  const bgColor = message.received ? "bg-gray-600" : "bg-primary";
+  const bgColor = message.received
+    ? "bg-gray-600 dark:bg-gray-700"
+    : "bg-primary";
 
   return (
     <div className={`flex w-full ${align}`}>

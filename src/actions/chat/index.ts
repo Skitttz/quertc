@@ -6,6 +6,7 @@ import { userRoom } from "@/lib/socket/rooms";
 import { getSocketServer } from "@/lib/socket-server";
 import { ChatModel } from "@/models/chat";
 import { UserModel } from "@/models/user";
+import { isFirebaseStorageUrl } from "@/utils/storage-url";
 import type {
   CreateChatResponse,
   IRequestCreateChat,
@@ -123,7 +124,13 @@ export const postNewGroupChat = async ({
 
     const participantIds = [...new Set(payload.users)];
 
-    if (!participantIds.includes(authUserId) || participantIds.length < 2) {
+    if (!participantIds.includes(authUserId)) {
+      return null;
+    }
+
+    const groupProfilePicture = payload.groupProfilePicture ?? "";
+
+    if (groupProfilePicture && !isFirebaseStorageUrl(groupProfilePicture)) {
       return null;
     }
 
@@ -132,6 +139,7 @@ export const postNewGroupChat = async ({
       createdBy: authUserId,
       isGroupChat: true,
       groupName,
+      groupProfilePicture,
       groupAdmins: [authUserId],
     });
 

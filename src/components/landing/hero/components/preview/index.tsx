@@ -42,7 +42,7 @@ function ChatPreview() {
           />
 
           <span className="text-sm font-semibold flex justify-center">
-            <Send className="text-gray-600" size={16} />
+            <Send className="text-muted-foreground" size={16} />
           </span>
         </form>
       </div>
