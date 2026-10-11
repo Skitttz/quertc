@@ -35,13 +35,26 @@ const chatSchema = new mongoose.Schema(
       type: [mongoose.Schema.Types.ObjectId],
       ref: "users",
     },
-    unreadCounts: {
-      type: Object,
+    pinnedMessages: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "messages",
+      default: [],
+    },
+    hiddenFor: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "users",
+      default: [],
+    },
+    clearedAt: {
+      type: Map,
+      of: Date,
       default: {},
     },
   },
   { timestamps: true },
 );
+
+chatSchema.index({ users: 1, updatedAt: -1 });
 
 const ChatModel =
   (mongoose.models?.chats as mongoose.Model<IChat>) ??

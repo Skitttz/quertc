@@ -1,5 +1,3 @@
-import type { IUserWithVirtual } from "@/interfaces/user";
-
 type DeviceType = "desktop" | "mobile";
 
 interface IHeaderRenderProps {
@@ -8,19 +6,18 @@ interface IHeaderRenderProps {
   onDrawerOpenChange: (v: boolean) => void;
 }
 
-type ISafeUserType = Omit<
-  IUserWithVirtual,
-  | "_id"
-  | "createdAt"
-  | "updatedAt"
-  | "firstName"
-  | "lastName"
-  | "username"
-  | "profilePicture"
-> & {
+interface ISafeUserType {
   _id: string;
-  createdAt: string;
+  clerkUserId: string | null;
+  name: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  bio?: string;
+  doNotDisturb?: boolean;
+  email: string;
   profilePicture?: string | null;
-};
+  createdAt: string;
+}
 
 export type { DeviceType, IHeaderRenderProps, ISafeUserType };

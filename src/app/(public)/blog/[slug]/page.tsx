@@ -10,9 +10,9 @@ import { formatLongDatePtBr } from "@/utils/date-helpers";
 import { generateSlug } from "@/utils/generate-slug";
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export async function generateStaticParams() {
@@ -24,7 +24,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps) {
-  const slug = params?.slug?.replace(/^[-]+|[-]+$/g, "") || "";
+  const { slug: rawSlug } = await params;
+  const slug = rawSlug?.replace(/^[-]+|[-]+$/g, "") || "";
   const posts = await getAllPosts();
 
   const post = posts.find((p) => generateSlug(p.title) === slug) || null;
@@ -42,8 +43,9 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug } = await params;
   const posts = await getAllPosts();
-  const post = posts.find((p) => generateSlug(p.title) === params.slug);
+  const post = posts.find((p) => generateSlug(p.title) === slug);
 
   if (!post) {
     notFound();

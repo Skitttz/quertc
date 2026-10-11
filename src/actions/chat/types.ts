@@ -12,6 +12,18 @@ interface IRequestCreateGroupChat {
   groupProfilePicture?: string;
 }
 
+interface IRequestUpdateGroup {
+  chatId: string;
+  groupName?: string;
+  groupBio?: string;
+  groupProfilePicture?: string;
+}
+
 type CreateChatResponse = IChat & Required<{ _id: string }> & { __v: number };
 
-export type { CreateChatResponse, IRequestCreateChat, IRequestCreateGroupChat };
+export type {
+  CreateChatResponse,
+  IRequestCreateChat,
+  IRequestCreateGroupChat,
+  IRequestUpdateGroup,
+};

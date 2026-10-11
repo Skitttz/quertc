@@ -1,11 +1,10 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ZoomableAvatar } from "@/components/chat/avatar-zoom";
 import type { IChat } from "@/interfaces/chat";
 import type { IMessage } from "@/interfaces/message";
 import { cn } from "@/lib/utils";
 import { getChatDisplay } from "@/utils/chat-display";
 import { formatMessageDate } from "@/utils/date-helpers";
 import { getMatchSnippet } from "@/utils/search-helpers";
-import { getNameInitials } from "@/utils/text-helpers";
 
 export function MessageSearchItem({
   chat,
@@ -36,45 +35,42 @@ export function MessageSearchItem({
   const showSender = chat.isGroupChat || senderId === currentUserId;
 
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(chat._id)}
+    <div
       className={cn(
-        "flex w-full items-center gap-3 rounded-md p-2 text-left transition-colors hover:bg-accent",
+        "flex w-full items-center gap-3 rounded-md p-2 transition-colors hover:bg-accent",
         isSelected && "bg-accent",
       )}
     >
-      <Avatar className="size-12 shrink-0">
-        {avatarSrc ? (
-          <AvatarImage
-            src={avatarSrc}
-            alt={`Avatar de ${displayName}`}
-            className="object-cover"
-          />
-        ) : (
-          <AvatarFallback className="text-lg">
-            {getNameInitials({ text: displayName })}
-          </AvatarFallback>
-        )}
-      </Avatar>
+      <ZoomableAvatar
+        className="size-12"
+        fallbackClassName="text-lg"
+        name={displayName ?? ""}
+        src={avatarSrc}
+      />
 
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <div className="flex items-baseline justify-between gap-2">
-          <p className="truncate font-semibold">{displayName}</p>
-          <span className="shrink-0 text-xs text-muted-foreground">
-            {formatMessageDate(message.createdAt)}
+      <button
+        type="button"
+        onClick={() => onSelect(chat._id)}
+        className="flex min-w-0 flex-1 text-left"
+      >
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="truncate font-semibold">{displayName}</p>
+            <span className="shrink-0 text-xs text-muted-foreground">
+              {formatMessageDate(message.createdAt)}
+            </span>
+          </div>
+
+          <span className="truncate text-sm text-muted-foreground">
+            {showSender && senderLabel && `${senderLabel}: `}
+            {before}
+            <mark className="rounded-xs bg-primary/15 font-medium text-foreground">
+              {match}
+            </mark>
+            {after}
           </span>
         </div>
-
-        <span className="truncate text-sm text-muted-foreground">
-          {showSender && senderLabel && `${senderLabel}: `}
-          {before}
-          <mark className="rounded-xs bg-primary/15 font-medium text-foreground">
-            {match}
-          </mark>
-          {after}
-        </span>
-      </div>
-    </button>
+      </button>
+    </div>
   );
 }

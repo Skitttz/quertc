@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     },
     lastName: {
       type: String,
-      required: true,
+      default: "",
     },
     username: {
       type: String,
@@ -20,6 +20,22 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     profilePicture: { type: String, required: false },
     bio: { type: String, required: false },
+    doNotDisturb: { type: Boolean, default: false },
+    pushSubscriptions: {
+      type: [
+        {
+          _id: false,
+          endpoint: String,
+          keys: { p256dh: String, auth: String },
+        },
+      ],
+      default: [],
+    },
+    contacts: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "users",
+      default: [],
+    },
   },
   { timestamps: true },
 );
@@ -27,4 +43,6 @@ const userSchema = new mongoose.Schema(
 const UserModel =
   (mongoose.models?.users as mongoose.Model<IUser>) ??
   mongoose.model<IUser>("users", userSchema);
-export { UserModel };
+const PUBLIC_USER_FIELDS = "firstName lastName username profilePicture bio";
+
+export { PUBLIC_USER_FIELDS, UserModel };

@@ -1,30 +1,54 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { IMessage } from "@/interfaces/message";
 import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
-import { MarkChatRead } from "@/store/slice/chat";
+import { MarkChatRead, ResetUnread } from "@/store/slice/chat";
 import { fetchMessagesByChat } from "@/store/thunks/message";
 import { ChatAreaEmpty } from "./empty";
 import { ChatAreaHeader } from "./header";
 import { ChatMessageInput } from "./input";
 import { ChatMessages } from "./messages";
+import { PinnedMessages } from "./pinned";
 
 export function ChatArea() {
   const dispatch = useAppDispatch();
   const { chats } = useAppSelector((state) => state.chat);
-  const { selectedChatId } = useAppSelector((state) => state.message);
-  const { currentUserData } = useAppSelector((state) => state.user);
+  const { selectedChatId, highlightedMessageId } = useAppSelector(
+    (state) => state.message,
+  );
+  const currentUserId = useAppSelector(
+    (state) => state.user.currentUserData?._id,
+  );
+
+  const [editingMessage, setEditingMessage] = useState<IMessage | null>(null);
+  const loadedChatId = useRef<string | null>(null);
 
   const selectedChat = chats.find((chat) => chat._id === selectedChatId);
 
   useEffect(() => {
-    if (!selectedChatId || !currentUserData) return;
+    if (!selectedChatId || !currentUserId) {
+      loadedChatId.current = null;
+      return;
+    }
 
-    dispatch(fetchMessagesByChat(selectedChatId));
+    const chatChanged = loadedChatId.current !== selectedChatId;
+    if (!chatChanged && !highlightedMessageId) return;
+
+    loadedChatId.current = selectedChatId;
     dispatch(
-      MarkChatRead({ chatId: selectedChatId, userId: currentUserData._id }),
+      fetchMessagesByChat({
+        chatId: selectedChatId,
+        around: highlightedMessageId ?? undefined,
+      }),
     );
-  }, [selectedChatId, currentUserData, dispatch]);
+
+    if (chatChanged) {
+      setEditingMessage(null);
+      dispatch(MarkChatRead({ chatId: selectedChatId, userId: currentUserId }));
+      dispatch(ResetUnread(selectedChatId));
+    }
+  }, [selectedChatId, currentUserId, highlightedMessageId, dispatch]);
 
   if (!selectedChat) {
     return (
@@ -37,8 +61,18 @@ export function ChatArea() {
   return (
     <div className="flex min-h-0 min-w-0 flex-col rounded-sm border">
       <ChatAreaHeader chat={selectedChat} />
-      <ChatMessages chatId={selectedChat._id} />
-      <ChatMessageInput chatId={selectedChat._id} />
+      <PinnedMessages chat={selectedChat} />
+      <ChatMessages chat={selectedChat} onEdit={setEditingMessage} />
+      <ChatMessageInput
+        chatId={selectedChat._id}
+        mentionable={
+          selectedChat.isGroupChat
+            ? selectedChat.users.filter((user) => user._id !== currentUserId)
+            : []
+        }
+        editingMessage={editingMessage}
+        onCancelEdit={() => setEditingMessage(null)}
+      />
     </div>
   );
 }

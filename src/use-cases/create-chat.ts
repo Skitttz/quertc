@@ -7,6 +7,7 @@ import type {
 } from "@/actions/chat/types";
 import { useAppDispatch } from "@/providers/store/hooks";
 import { AddChat } from "@/store/slice/chat";
+import { SelectChat } from "@/store/slice/message";
 
 export function useChat() {
   const dispatch = useAppDispatch();
@@ -17,6 +18,7 @@ export function useChat() {
       return null;
     }
     dispatch(AddChat(newChat));
+    dispatch(SelectChat(newChat._id));
     return newChat;
   }
 
@@ -26,6 +28,7 @@ export function useChat() {
       return null;
     }
     dispatch(AddChat(newChat));
+    dispatch(SelectChat(newChat._id));
     return newChat;
   }
 

@@ -5,7 +5,6 @@ interface IUserMenuProps {
   userId: string;
   profilePicture: string;
   registrationDate: string;
-  variant: "desktop" | "mobile";
   onAvatarChange: (newAvatarUrl: string) => void;
   onAvatarLoaded: () => void;
   isAvatarLoading: boolean;

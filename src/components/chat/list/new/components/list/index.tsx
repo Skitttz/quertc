@@ -1,126 +1,76 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import type { IRequestCreateChat } from "@/actions/chat/types";
-import { getAllUsers } from "@/actions/user";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState } from "react";
+import { UserAvatar } from "@/components/chat/avatar";
 import { Button } from "@/components/ui/button";
-import type { IUserWithVirtual } from "@/interfaces/user";
 import { useAppSelector } from "@/providers/store/hooks";
+import { useContacts } from "@/use-cases/contacts";
 import { useChat } from "@/use-cases/create-chat";
-import { getNameInitials } from "@/utils/text-helpers";
 import { NewChatListUsersEmpty } from "./empty";
 import { NewChatListUsersShimmer } from "./shimmer";
 import type { NewChatListUsersProps } from "./types";
 
 export function NewChatListUsers({
-  button,
   handleCloseDialog,
+  onAddContact,
 }: NewChatListUsersProps) {
-  const [users, setUsers] = useState<IUserWithVirtual[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [pendingCreateNewChat, setPendingCreateNewChat] = useState(false);
+  const [pendingId, setPendingId] = useState<string | null>(null);
 
   const { currentUserData } = useAppSelector((state) => state.user);
-  const { chats } = useAppSelector((state) => state.chat);
+  const { contacts, loading } = useContacts();
   const { createChat } = useChat();
 
-  const handleCreateNewChat = async ({
-    targetUserId,
-  }: {
-    targetUserId: string;
-  }) => {
-    try {
-      if (!currentUserData?._id) return;
+  const handleOpenChat = async (targetUserId: string) => {
+    if (!currentUserData?._id) return;
 
-      setPendingCreateNewChat(true);
+    setPendingId(targetUserId);
+    const chat = await createChat({
+      users: [targetUserId, currentUserData._id],
+      createdBy: currentUserData._id,
+    });
+    setPendingId(null);
 
-      const payload: IRequestCreateChat = {
-        users: [targetUserId, currentUserData._id],
-        createdBy: currentUserData._id,
-      };
-
-      await createChat(payload);
-
-      handleCloseDialog();
-    } catch (error) {
-      console.error("Erro ao criar novo chat:", error);
-    } finally {
-      setPendingCreateNewChat(false);
-    }
+    if (chat) handleCloseDialog();
   };
 
-  const availableUsers = useMemo(() => {
-    if (!currentUserData?._id) return [];
-
-    const hasPrivateChatWithUser = (userId?: string) =>
-      chats.some(
-        (chat) =>
-          !chat.isGroupChat && chat.users.some((user) => user._id === userId),
-      );
-
-    return users.filter((user) => {
-      if (user._id === currentUserData._id) return false;
-      if (hasPrivateChatWithUser(String(user._id))) return false;
-      return true;
-    });
-  }, [users, chats, currentUserData]);
-
-  useEffect(() => {
-    async function loadUsers() {
-      try {
-        setLoading(true);
-        const data = await getAllUsers();
-        if (data) setUsers(data);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (currentUserData?._id) {
-      loadUsers();
-    }
-  }, [currentUserData]);
-
-  if (loading) {
+  if (loading && !contacts.length) {
     return <NewChatListUsersShimmer />;
   }
 
-  if (!availableUsers.length) {
-    return <NewChatListUsersEmpty />;
+  if (!contacts.length) {
+    return (
+      <NewChatListUsersEmpty
+        title="Você ainda não tem contatos"
+        description="Adicione alguém pelo nome ou pelo ID para começar a conversar."
+        action={{ label: "Adicionar contato", onClick: onAddContact }}
+      />
+    );
   }
 
   return (
     <div className="max-h-[55vh] space-y-2 overflow-y-auto">
-      {availableUsers.map((user) => (
+      {contacts.map((user) => (
         <div
-          key={user.email}
-          className="flex w-full items-center justify-between rounded-md"
+          key={user._id}
+          className="flex w-full items-center justify-between gap-2 rounded-md"
         >
-          <div className="flex items-center gap-2">
-            <Avatar className="size-12 border-2 border-border">
-              <AvatarImage
-                src={user.profilePicture}
-                alt={user.name}
-                className="object-cover"
-              />
-              {!user.profilePicture && (
-                <AvatarFallback className="text-2xl">
-                  {getNameInitials({ text: user.username })}
-                </AvatarFallback>
-              )}
-            </Avatar>
+          <div className="flex min-w-0 items-center gap-2">
+            <UserAvatar
+              className="size-12 border-2 border-border"
+              fallbackClassName="text-2xl"
+              name={user.username}
+              src={user.profilePicture}
+            />
 
-            <span>{user.name}</span>
+            <span className="truncate">{user.name}</span>
           </div>
 
           <Button
-            loading={pendingCreateNewChat}
-            onClick={() =>
-              handleCreateNewChat({ targetUserId: String(user._id) })
-            }
+            loading={pendingId === user._id}
+            disabled={pendingId !== null}
+            onClick={() => handleOpenChat(user._id)}
           >
-            {button?.labelAction || "Criar conversa"}
+            Conversar
           </Button>
         </div>
       ))}

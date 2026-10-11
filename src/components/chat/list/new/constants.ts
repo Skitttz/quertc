@@ -5,15 +5,15 @@ enum NewChatDialogKeyEnum {
 }
 
 const newChatDropdownItems = [
-  // {
-  //   label: "Adicionar novo contato",
-  //   dialogKey: NewChatDialogKeyEnum.ADD_CONTACT,
-  // },
   {
     label: "Criar nova conversa",
     dialogKey: NewChatDialogKeyEnum.NEW_CHAT,
   },
   { label: "Criar novo grupo", dialogKey: NewChatDialogKeyEnum.NEW_GROUP },
+  {
+    label: "Adicionar contato",
+    dialogKey: NewChatDialogKeyEnum.ADD_CONTACT,
+  },
 ] as const;
 
 export { NewChatDialogKeyEnum, newChatDropdownItems };

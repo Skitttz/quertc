@@ -3,6 +3,7 @@ import { Calendar, Hash, Loader2, LogOut, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { updateUserAvatar } from "@/actions/user";
+import { NotificationSettings } from "@/components/notifications/settings";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,14 +18,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { disablePush } from "@/lib/push-client";
 import { AppRoutesEnum } from "@/shared/route";
 import { patchCurrentUserData } from "@/store/slice/user";
 import { formatLongDatePtBr } from "@/utils/date-helpers";
 import { getNameInitials } from "@/utils/text-helpers";
-import { beforeUpload, uploadFileToFirebase } from "@/utils/upload-helpers";
+import { getUploadError, uploadFileToFirebase } from "@/utils/upload-helpers";
 import { AvatarOverlay } from "./avatar";
 import { AvatarOverlayEnum } from "./constants";
 import { ItemInfo } from "./itemInfo";
+import { ProfileForm } from "./profile-form";
 import { drawerStyles } from "./styles";
 import type { IProfileDrawerProps, IUploadStateProps } from "./types";
 
@@ -68,7 +71,14 @@ export function ProfileDrawer({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!beforeUpload(file)) return;
+    const uploadError = getUploadError(file);
+    setUpload({
+      status: uploadError ? "error" : "idle",
+      progress: 0,
+      error: uploadError ?? undefined,
+    });
+    if (uploadError) return;
+
     setPreview(URL.createObjectURL(file));
     uploadToFirebase(file);
   };
@@ -98,7 +108,12 @@ export function ProfileDrawer({
       );
     } catch (error) {
       console.error(error);
-      setUpload({ status: "error", progress: 0 });
+      setPreview(null);
+      setUpload({
+        status: "error",
+        progress: 0,
+        error: "Não foi possível enviar a foto. Tente novamente.",
+      });
     }
   };
 
@@ -106,6 +121,7 @@ export function ProfileDrawer({
     try {
       setIsLoadingSignOut(true);
       closeDrawer();
+      await disablePush().catch(() => {});
       await signOut({ redirectUrl: AppRoutesEnum.HOME });
     } catch (error) {
       console.error(error);
@@ -123,7 +139,7 @@ export function ProfileDrawer({
   return (
     <SheetContent
       side="right"
-      className="w-[280px] sm:w-[320px] p-6 flex flex-col gap-6"
+      className="w-[280px] sm:w-[320px] p-6 flex flex-col gap-6 overflow-y-auto"
     >
       <SheetHeader className="sr-only">
         <SheetTitle>Perfil do Usuário</SheetTitle>
@@ -162,11 +178,9 @@ export function ProfileDrawer({
                 }
               }}
             />
-            {!avatarUrl && (
-              <AvatarFallback className="text-2xl">
-                {getNameInitials({ text: name })}
-              </AvatarFallback>
-            )}
+            <AvatarFallback className="text-2xl">
+              {getNameInitials({ text: name })}
+            </AvatarFallback>
           </Avatar>
 
           <div
@@ -184,7 +198,13 @@ export function ProfileDrawer({
         <span className="text-xs text-muted-foreground">
           Clique para alterar sua foto
         </span>
+
+        {upload.error && (
+          <p className="text-center text-xs text-destructive">{upload.error}</p>
+        )}
       </div>
+
+      <ProfileForm />
 
       <div className="flex flex-col gap-4 border-t pt-4">
         <ItemInfo
@@ -197,7 +217,7 @@ export function ProfileDrawer({
           value={userId}
           icon={<Hash className={icon()} />}
           tooltip={{
-            content: "Compartilhe este ID para iniciar uma nova conversa",
+            content: "Compartilhe este ID para que adicionem você aos contatos",
           }}
         />
         <ItemInfo
@@ -206,6 +226,8 @@ export function ProfileDrawer({
           icon={<Calendar className={icon()} />}
         />
       </div>
+
+      <NotificationSettings />
 
       <AlertDialog>
         <AlertDialogTrigger asChild>

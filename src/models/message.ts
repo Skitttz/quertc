@@ -22,9 +22,28 @@ const messageSchema = new mongoose.Schema(
       default: "",
     },
     readBy: { type: [mongoose.Schema.Types.ObjectId], ref: "users" },
+    reactions: {
+      type: [
+        {
+          _id: false,
+          user: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+          emoji: String,
+        },
+      ],
+      default: [],
+    },
+    mentions: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "users",
+      default: [],
+    },
+    editedAt: { type: Date, default: null },
+    deletedAt: { type: Date, default: null },
   },
   { timestamps: true },
 );
+
+messageSchema.index({ chat: 1, createdAt: -1 });
 
 const MessageModel =
   (mongoose.models?.messages as mongoose.Model<IMessage>) ??

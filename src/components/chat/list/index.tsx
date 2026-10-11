@@ -5,8 +5,9 @@ import { useMessageSearch } from "@/hooks/use-message-search";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
 import type { ChatState } from "@/store/slice/chat";
-import { SelectChat } from "@/store/slice/message";
+import { OpenMessage, SelectChat } from "@/store/slice/message";
 import { fetchChatsByUser } from "@/store/thunks/chat";
+import { fetchContacts } from "@/store/thunks/contact";
 import { chatMatchesSearch } from "@/utils/chat-display";
 import { ChatHeaderList } from "./header";
 import { ChatItem } from "./item";
@@ -27,7 +28,36 @@ export function ChatList() {
   useEffect(() => {
     if (!currentUserData) return;
     dispatch(fetchChatsByUser(currentUserData._id));
+    dispatch(fetchContacts());
   }, [currentUserData, dispatch]);
+
+  useEffect(() => {
+    const openFromNotification = (chatId: string | null | undefined) => {
+      if (chatId && chats.some((chat) => chat._id === chatId)) {
+        dispatch(SelectChat(chatId));
+        return true;
+      }
+      return false;
+    };
+
+    const url = new URL(window.location.href);
+    if (openFromNotification(url.searchParams.get("conversa"))) {
+      url.searchParams.delete("conversa");
+      window.history.replaceState(null, "", url);
+    }
+
+    if (!("serviceWorker" in navigator)) return;
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === "open-chat") {
+        openFromNotification(event.data.chatId);
+      }
+    };
+
+    navigator.serviceWorker.addEventListener("message", handleMessage);
+    return () =>
+      navigator.serviceWorker.removeEventListener("message", handleMessage);
+  }, [chats, dispatch]);
 
   const matchingChats = useMemo(
     () =>
@@ -53,6 +83,9 @@ export function ChatList() {
           currentUserId={currentUserData?._id}
           matchingChats={matchingChats}
           messages={messageResults}
+          onOpenMessage={(chatId, messageId) =>
+            dispatch(OpenMessage({ chatId, messageId }))
+          }
           onSelect={handleSelect}
           query={query}
           searchingMessages={searchingMessages}

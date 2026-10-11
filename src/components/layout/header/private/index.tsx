@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Logo } from "@/components/logo";
+import { DoNotDisturbToggle } from "@/components/notifications/do-not-disturb-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAppSelector } from "@/providers/store/hooks";
 import { AppRoutesEnum } from "@/shared/route";
@@ -26,6 +27,7 @@ export function Header() {
         _id: String(currentUserData._id || ""),
         clerkUserId: currentUserData.clerkUserId ?? null,
         name: currentUserData.name ?? "",
+        username: currentUserData.username,
         email: currentUserData.email ?? "",
         profilePicture: currentUserData?.profilePicture,
         createdAt: currentUserData.createdAt,
@@ -85,15 +87,10 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <DoNotDisturbToggle />
           <ThemeToggle />
 
-          <div className="hidden md:flex">
-            <UserMenu {...userMenuProps} variant="desktop" />
-          </div>
-
-          <div className="flex md:hidden">
-            <UserMenu {...userMenuProps} variant="mobile" />
-          </div>
+          <UserMenu {...userMenuProps} />
         </div>
       </div>
     </header>

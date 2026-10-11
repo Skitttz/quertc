@@ -12,14 +12,16 @@ export function useSendMessage() {
   async function sendMessage({
     chatId,
     text,
+    image,
   }: {
     chatId: string;
     text: string;
+    image?: string;
   }) {
     if (!currentUserData?._id) return null;
 
     const message = await postNewMessage({
-      payload: { chatId, senderId: currentUserData._id, text },
+      payload: { chatId, senderId: currentUserData._id, text, image },
     });
     if (!message) return null;
 

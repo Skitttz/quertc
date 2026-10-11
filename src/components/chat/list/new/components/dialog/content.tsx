@@ -1,45 +1,39 @@
+import { AddContactForm } from "../contact";
 import { NewGroupChatForm } from "../group";
 import { NewChatListUsers } from "../list";
-import type { NewChatDialogVariant } from "./types";
+import type { NewChatContentProps, NewChatDialogVariant } from "./types";
 
-export function AddContactContent({
-  handleCloseDialog,
-}: {
-  handleCloseDialog: () => void;
-}) {
-  return (
-    <div className="flex flex-col gap-4">
-      <NewChatListUsers handleCloseDialog={handleCloseDialog} />
-    </div>
-  );
+export function AddContactContent() {
+  return <AddContactForm />;
 }
 
 export function NewChatContent({
   handleCloseDialog,
-}: {
-  handleCloseDialog: () => void;
-}) {
+  onAddContact,
+}: NewChatContentProps) {
   return (
-    <div className="flex flex-col gap-4">
-      <NewChatListUsers
-        handleCloseDialog={handleCloseDialog}
-        button={{ labelAction: "Selecionar" }}
-      />
-    </div>
+    <NewChatListUsers
+      handleCloseDialog={handleCloseDialog}
+      onAddContact={onAddContact}
+    />
   );
 }
 
 export function NewGroupContent({
   handleCloseDialog,
-}: {
-  handleCloseDialog: () => void;
-}) {
-  return <NewGroupChatForm handleCloseDialog={handleCloseDialog} />;
+  onAddContact,
+}: NewChatContentProps) {
+  return (
+    <NewGroupChatForm
+      handleCloseDialog={handleCloseDialog}
+      onAddContact={onAddContact}
+    />
+  );
 }
 
 export const newChatContentMap: Record<
   NewChatDialogVariant,
-  React.ComponentType<{ handleCloseDialog: () => void }>
+  React.ComponentType<NewChatContentProps>
 > = {
   "add-contact": AddContactContent,
   "new-chat": NewChatContent,
