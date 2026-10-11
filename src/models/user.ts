@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     },
     lastName: {
       type: String,
-      required: true,
+      default: "",
     },
     username: {
       type: String,
@@ -27,4 +27,6 @@ const userSchema = new mongoose.Schema(
 const UserModel =
   (mongoose.models?.users as mongoose.Model<IUser>) ??
   mongoose.model<IUser>("users", userSchema);
-export { UserModel };
+const PUBLIC_USER_FIELDS = "firstName lastName username profilePicture bio";
+
+export { PUBLIC_USER_FIELDS, UserModel };

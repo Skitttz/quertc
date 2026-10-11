@@ -1,14 +1,13 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { IUserWithVirtual } from "@/interfaces/user";
+import { UserAvatar } from "@/components/chat/avatar";
+import type { IPublicUserWithName } from "@/interfaces/user";
 import { cn } from "@/lib/utils";
-import { getNameInitials } from "@/utils/text-helpers";
 
 export function NewGroupUserItem({
   user,
   isSelected,
   onToggle,
 }: {
-  user: IUserWithVirtual;
+  user: IPublicUserWithName;
   isSelected: boolean;
   onToggle: () => void;
 }) {
@@ -21,18 +20,12 @@ export function NewGroupUserItem({
         isSelected && "bg-accent",
       )}
     >
-      <Avatar className="size-12 border-2 border-border">
-        <AvatarImage
-          src={user.profilePicture}
-          alt={user.name}
-          className="object-cover"
-        />
-        {!user.profilePicture && (
-          <AvatarFallback className="text-2xl">
-            {getNameInitials({ text: user.username })}
-          </AvatarFallback>
-        )}
-      </Avatar>
+      <UserAvatar
+        className="size-12 border-2 border-border"
+        fallbackClassName="text-2xl"
+        name={user.username}
+        src={user.profilePicture}
+      />
 
       <span className="flex-1">{user.name}</span>
 

@@ -16,3 +16,16 @@ export interface IUser {
 export interface IUserWithVirtual extends IUser {
   name: string;
 }
+
+export interface IPublicUser {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  profilePicture?: string;
+  bio?: string;
+}
+
+export interface IPublicUserWithName extends IPublicUser {
+  name: string;
+}

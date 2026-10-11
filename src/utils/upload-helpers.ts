@@ -11,20 +11,18 @@ type UploadOptions = {
   file: File;
 };
 
-const beforeUpload = (file: File) => {
-  const isImage = file.type.startsWith("image/");
-  if (!isImage) {
-    alert("Apenas imagens são permitidas");
-    return false;
+const MAX_IMAGE_SIZE_MB = 2;
+
+const getUploadError = (file: File) => {
+  if (!file.type.startsWith("image/")) {
+    return "Apenas imagens são permitidas.";
   }
 
-  const isLt2MB = file.size / 1024 / 1024 < 2;
-  if (!isLt2MB) {
-    alert("A imagem deve ter no máximo 2MB");
-    return false;
+  if (file.size / 1024 / 1024 >= MAX_IMAGE_SIZE_MB) {
+    return `A imagem deve ter no máximo ${MAX_IMAGE_SIZE_MB} MB.`;
   }
 
-  return true;
+  return null;
 };
 
 const uploadFileToFirebase = (
@@ -55,4 +53,4 @@ const uploadFileToFirebase = (
   });
 };
 
-export { beforeUpload, uploadFileToFirebase };
+export { getUploadError, uploadFileToFirebase };

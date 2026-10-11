@@ -1,8 +1,7 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/chat/avatar";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/providers/store/hooks";
 import { getChatDisplay } from "@/utils/chat-display";
-import { getNameInitials } from "@/utils/text-helpers";
 import type { ChatItemProps } from "./types";
 
 export function ChatItem({
@@ -40,19 +39,12 @@ export function ChatItem({
         isSelected && "bg-accent",
       )}
     >
-      <Avatar className="size-12 shrink-0">
-        {avatarSrc ? (
-          <AvatarImage
-            src={avatarSrc}
-            alt={`Avatar de ${displayName}`}
-            className="object-cover"
-          />
-        ) : (
-          <AvatarFallback className="text-lg">
-            {getNameInitials({ text: displayName })}
-          </AvatarFallback>
-        )}
-      </Avatar>
+      <UserAvatar
+        className="size-12"
+        fallbackClassName="text-lg"
+        name={displayName}
+        src={avatarSrc}
+      />
 
       <div className="flex min-w-0 flex-col gap-1">
         <p className="truncate font-semibold">{displayName}</p>

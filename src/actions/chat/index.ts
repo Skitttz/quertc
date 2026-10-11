@@ -5,7 +5,7 @@ import type { IChat } from "@/interfaces/chat";
 import { userRoom } from "@/lib/socket/rooms";
 import { getSocketServer } from "@/lib/socket-server";
 import { ChatModel } from "@/models/chat";
-import { UserModel } from "@/models/user";
+import { PUBLIC_USER_FIELDS, UserModel } from "@/models/user";
 import { isFirebaseStorageUrl } from "@/utils/storage-url";
 import type {
   CreateChatResponse,
@@ -61,7 +61,7 @@ export const postNewChat = async ({
       isGroupChat: false,
       users: { $all: [userA, userB] },
     })
-      .populate("users")
+      .populate("users", PUBLIC_USER_FIELDS)
       .populate("lastMessage")
       .lean();
 
@@ -72,7 +72,7 @@ export const postNewChat = async ({
     const newChat = await ChatModel.create({ ...payload, isGroupChat: false });
 
     const populatedChat = await ChatModel.findById(newChat._id)
-      .populate("users")
+      .populate("users", PUBLIC_USER_FIELDS)
       .populate("lastMessage")
       .lean();
 
@@ -144,7 +144,7 @@ export const postNewGroupChat = async ({
     });
 
     const populatedChat = await ChatModel.findById(newChat._id)
-      .populate("users")
+      .populate("users", PUBLIC_USER_FIELDS)
       .populate("lastMessage")
       .lean();
 
@@ -189,7 +189,7 @@ export const getAllChatsByUser = async ({
 
     const chats = await ChatModel.find({ users: { $in: [userId] } })
       .sort({ updatedAt: -1 })
-      .populate("users")
+      .populate("users", PUBLIC_USER_FIELDS)
       .populate("lastMessage")
       .lean<IChat[]>();
 

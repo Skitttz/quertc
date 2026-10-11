@@ -2,14 +2,34 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { Types } from "mongoose";
 import { connectToDatabase } from "@/config/database";
-import type { IUserWithVirtual } from "@/interfaces/user";
-import { UserModel } from "@/models/user";
+import type { IPublicUserWithName, IUserWithVirtual } from "@/interfaces/user";
+import { getAuthenticatedUser } from "@/lib/auth";
+import { PUBLIC_USER_FIELDS, UserModel } from "@/models/user";
+import { isFirebaseStorageUrl } from "@/utils/storage-url";
 import { ALLOWED_FIELDS } from "./constants";
 import type {
   AllowedUserFieldsUpdateType,
   UpdateUserInput,
   UpdateUserResult,
 } from "./types";
+
+const toUsernameBase = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "") || "user";
+
+async function generateUsername({ email }: { email: string }) {
+  const base = toUsernameBase(email.split("@")[0]);
+  let candidate = base;
+
+  while (await UserModel.exists({ username: candidate })) {
+    const suffix = Math.random().toString(36).slice(2, 6).padEnd(4, "0");
+    candidate = `${base}_${suffix}`;
+  }
+
+  return candidate;
+}
 
 export const getCurrentUser = async (): Promise<IUserWithVirtual | null> => {
   try {
@@ -31,20 +51,30 @@ export const getCurrentUser = async (): Promise<IUserWithVirtual | null> => {
       };
     }
 
-    const newUserPayload = {
-      clerkUserId: clerkUser.id,
-      firstName: clerkUser.firstName ?? "",
-      lastName: clerkUser.lastName ?? "",
-      username: clerkUser.username ?? "",
-      email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
-      profilePicture: clerkUser.imageUrl,
-    };
+    const email = clerkUser.emailAddresses[0]?.emailAddress ?? "";
 
-    if (!newUserPayload.clerkUserId || !newUserPayload.email) {
+    if (!clerkUser.id || !email) {
       throw new Error("Missing required user data");
     }
 
-    const newUser = await UserModel.create(newUserPayload);
+    const username = clerkUser.username || (await generateUsername({ email }));
+
+    const newUserPayload = {
+      clerkUserId: clerkUser.id,
+      firstName: clerkUser.firstName || username,
+      lastName: clerkUser.lastName ?? "",
+      username,
+      email,
+      profilePicture: clerkUser.imageUrl,
+    };
+
+    const newUser = await UserModel.create(newUserPayload).catch(
+      async (error) => {
+        const existing = await UserModel.findOne({ clerkUserId: clerkUser.id });
+        if (!existing) throw error;
+        return existing;
+      },
+    );
     const user = newUser.toJSON();
 
     return {
@@ -57,11 +87,12 @@ export const getCurrentUser = async (): Promise<IUserWithVirtual | null> => {
   }
 };
 
-export const getAllUsers = async (): Promise<IUserWithVirtual[]> => {
+export const getAllUsers = async (): Promise<IPublicUserWithName[]> => {
   try {
-    await connectToDatabase();
+    const authUser = await getAuthenticatedUser();
+    if (!authUser) return [];
 
-    const users = await UserModel.find().lean();
+    const users = await UserModel.find().select(PUBLIC_USER_FIELDS).lean();
 
     return users.map((user) => ({
       ...user,
@@ -127,6 +158,7 @@ export async function updateUser<T>({
 export async function updateUserAvatar({ avatarUrl }: { avatarUrl: string }) {
   const user = await getCurrentUser();
   if (!user) throw new Error("Não autenticado");
+  if (!isFirebaseStorageUrl(avatarUrl)) throw new Error("Foto inválida");
 
   await UserModel.findByIdAndUpdate(user._id, {
     $set: { profilePicture: avatarUrl },

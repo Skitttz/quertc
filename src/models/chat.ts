@@ -43,6 +43,8 @@ const chatSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+chatSchema.index({ users: 1, updatedAt: -1 });
+
 const ChatModel =
   (mongoose.models?.chats as mongoose.Model<IChat>) ??
   mongoose.model<IChat>("chats", chatSchema);

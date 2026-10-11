@@ -1,11 +1,10 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/chat/avatar";
 import type { IChat } from "@/interfaces/chat";
 import type { IMessage } from "@/interfaces/message";
 import { cn } from "@/lib/utils";
 import { getChatDisplay } from "@/utils/chat-display";
 import { formatMessageDate } from "@/utils/date-helpers";
 import { getMatchSnippet } from "@/utils/search-helpers";
-import { getNameInitials } from "@/utils/text-helpers";
 
 export function MessageSearchItem({
   chat,
@@ -44,19 +43,12 @@ export function MessageSearchItem({
         isSelected && "bg-accent",
       )}
     >
-      <Avatar className="size-12 shrink-0">
-        {avatarSrc ? (
-          <AvatarImage
-            src={avatarSrc}
-            alt={`Avatar de ${displayName}`}
-            className="object-cover"
-          />
-        ) : (
-          <AvatarFallback className="text-lg">
-            {getNameInitials({ text: displayName })}
-          </AvatarFallback>
-        )}
-      </Avatar>
+      <UserAvatar
+        className="size-12"
+        fallbackClassName="text-lg"
+        name={displayName}
+        src={avatarSrc}
+      />
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex items-baseline justify-between gap-2">

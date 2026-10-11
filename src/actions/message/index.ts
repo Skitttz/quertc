@@ -9,6 +9,7 @@ import { MessageModel } from "@/models/message";
 import { UserModel } from "@/models/user";
 import { toAccentInsensitivePattern } from "@/utils/search-helpers";
 import {
+  MESSAGE_MAX_LENGTH,
   MESSAGE_SEARCH_LIMIT,
   MESSAGE_SEARCH_MAX_LENGTH,
   MESSAGE_SEARCH_MIN_LENGTH,
@@ -77,7 +78,7 @@ export const postNewMessage = async ({
     await connectToDatabase();
 
     const text = payload.text.trim();
-    if (!text) return null;
+    if (!text || text.length > MESSAGE_MAX_LENGTH) return null;
 
     const member = await getAuthenticatedChatMember({ chatId: payload.chatId });
     if (!member) return null;

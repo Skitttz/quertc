@@ -1,7 +1,7 @@
 "use client";
 
 import { XIcon } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/chat/avatar";
 import {
   Dialog,
   DialogClose,
@@ -10,7 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { getNameInitials } from "@/utils/text-helpers";
 
 export function ZoomableAvatar({
   className,
@@ -22,11 +21,7 @@ export function ZoomableAvatar({
   src: string;
 }) {
   if (!src) {
-    return (
-      <Avatar className={className}>
-        <AvatarFallback>{getNameInitials({ text: name })}</AvatarFallback>
-      </Avatar>
-    );
+    return <UserAvatar className={className} name={name} />;
   }
 
   return (
@@ -37,13 +32,7 @@ export function ZoomableAvatar({
           aria-label={`Ampliar foto de ${name}`}
           className="shrink-0 rounded-full outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <Avatar className={className}>
-            <AvatarImage
-              src={src}
-              alt={`Avatar de ${name}`}
-              className="object-cover"
-            />
-          </Avatar>
+          <UserAvatar className={className} name={name} src={src} />
         </button>
       </DialogTrigger>
 

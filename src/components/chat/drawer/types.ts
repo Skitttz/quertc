@@ -12,6 +12,7 @@ interface IProfileDrawerProps {
 interface IUploadStateProps {
   status: "idle" | "uploading" | "success" | "error";
   progress: number;
+  error?: string;
 }
 
 export type { IProfileDrawerProps, IUploadStateProps };

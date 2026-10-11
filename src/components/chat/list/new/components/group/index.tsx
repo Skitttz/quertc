@@ -5,11 +5,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getAllUsers } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { IUserWithVirtual } from "@/interfaces/user";
+import type { IPublicUserWithName } from "@/interfaces/user";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/providers/store/hooks";
 import { useChat } from "@/use-cases/create-chat";
-import { beforeUpload, uploadFileToFirebase } from "@/utils/upload-helpers";
+import { getUploadError, uploadFileToFirebase } from "@/utils/upload-helpers";
 import { NewChatListUsersEmpty } from "../list/empty";
 import { NewChatListUsersShimmer } from "../list/shimmer";
 import { NewGroupUserItem } from "./item";
@@ -19,7 +19,7 @@ export function NewGroupChatForm({
 }: {
   handleCloseDialog: () => void;
 }) {
-  const [users, setUsers] = useState<IUserWithVirtual[]>([]);
+  const [users, setUsers] = useState<IPublicUserWithName[]>([]);
   const [loading, setLoading] = useState(true);
   const [groupName, setGroupName] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
@@ -68,7 +68,11 @@ export function NewGroupChatForm({
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
-    if (!file || !beforeUpload(file)) return;
+    if (!file) return;
+
+    const uploadError = getUploadError(file);
+    setError(uploadError);
+    if (uploadError) return;
 
     setPhoto(file);
   };
@@ -197,7 +201,7 @@ export function NewGroupChatForm({
         <div className="max-h-[45vh] space-y-2 overflow-y-auto">
           {availableUsers.map((user) => (
             <NewGroupUserItem
-              key={user.email}
+              key={user._id}
               user={user}
               isSelected={selectedUserIds.includes(String(user._id))}
               onToggle={() => toggleUser(String(user._id))}

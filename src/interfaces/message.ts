@@ -1,13 +1,13 @@
 import type { IChat } from "./chat";
-import type { IUser } from "./user";
+import type { IPublicUser } from "./user";
 
 export interface IMessage {
   _id: string;
   chat: IChat | string;
-  sender: IUser | string;
+  sender: IPublicUser | string;
   text: string;
   image: string;
-  readBy: Array<IUser | string>;
+  readBy: Array<IPublicUser | string>;
   createdAt: string;
   updatedAt: string;
 }

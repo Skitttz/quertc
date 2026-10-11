@@ -21,7 +21,7 @@ import { AppRoutesEnum } from "@/shared/route";
 import { patchCurrentUserData } from "@/store/slice/user";
 import { formatLongDatePtBr } from "@/utils/date-helpers";
 import { getNameInitials } from "@/utils/text-helpers";
-import { beforeUpload, uploadFileToFirebase } from "@/utils/upload-helpers";
+import { getUploadError, uploadFileToFirebase } from "@/utils/upload-helpers";
 import { AvatarOverlay } from "./avatar";
 import { AvatarOverlayEnum } from "./constants";
 import { ItemInfo } from "./itemInfo";
@@ -68,7 +68,14 @@ export function ProfileDrawer({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!beforeUpload(file)) return;
+    const uploadError = getUploadError(file);
+    setUpload({
+      status: uploadError ? "error" : "idle",
+      progress: 0,
+      error: uploadError ?? undefined,
+    });
+    if (uploadError) return;
+
     setPreview(URL.createObjectURL(file));
     uploadToFirebase(file);
   };
@@ -98,7 +105,12 @@ export function ProfileDrawer({
       );
     } catch (error) {
       console.error(error);
-      setUpload({ status: "error", progress: 0 });
+      setPreview(null);
+      setUpload({
+        status: "error",
+        progress: 0,
+        error: "Não foi possível enviar a foto. Tente novamente.",
+      });
     }
   };
 
@@ -162,11 +174,9 @@ export function ProfileDrawer({
                 }
               }}
             />
-            {!avatarUrl && (
-              <AvatarFallback className="text-2xl">
-                {getNameInitials({ text: name })}
-              </AvatarFallback>
-            )}
+            <AvatarFallback className="text-2xl">
+              {getNameInitials({ text: name })}
+            </AvatarFallback>
           </Avatar>
 
           <div
@@ -184,6 +194,10 @@ export function ProfileDrawer({
         <span className="text-xs text-muted-foreground">
           Clique para alterar sua foto
         </span>
+
+        {upload.error && (
+          <p className="text-center text-xs text-destructive">{upload.error}</p>
+        )}
       </div>
 
       <div className="flex flex-col gap-4 border-t pt-4">

@@ -2,6 +2,7 @@
 
 import { SendIcon } from "lucide-react";
 import { type KeyboardEvent, useState } from "react";
+import { MESSAGE_MAX_LENGTH } from "@/actions/message/constants";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useSendMessage } from "@/use-cases/send-message";
@@ -35,6 +36,7 @@ export function ChatMessageInput({ chatId }: { chatId: string }) {
         onChange={(event) => setText(event.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Escreva uma mensagem"
+        maxLength={MESSAGE_MAX_LENGTH}
         className="max-h-32 min-h-10 resize-none"
       />
 

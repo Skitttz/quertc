@@ -1,7 +1,6 @@
 import { forwardRef } from "react";
+import { UserAvatar } from "@/components/chat/avatar";
 import { Divisor } from "@/components/divisor";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getNameInitials } from "@/utils/text-helpers";
 import type { IUserMenuTriggerProps } from "./types";
 
 export const UserMenuTrigger = forwardRef<
@@ -25,13 +24,7 @@ export const UserMenuTrigger = forwardRef<
         </>
       )}
 
-      <Avatar className={isDesktop ? "h-9 w-9 flex-shrink-0" : "h-9 w-9"}>
-        {profilePicture ? (
-          <AvatarImage src={profilePicture} className="object-cover" />
-        ) : (
-          <AvatarFallback>{getNameInitials({ text: name })}</AvatarFallback>
-        )}
-      </Avatar>
+      <UserAvatar className="h-9 w-9" name={name} src={profilePicture} />
     </button>
   );
 });

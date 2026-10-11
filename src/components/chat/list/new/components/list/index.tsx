@@ -3,12 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import type { IRequestCreateChat } from "@/actions/chat/types";
 import { getAllUsers } from "@/actions/user";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/chat/avatar";
 import { Button } from "@/components/ui/button";
-import type { IUserWithVirtual } from "@/interfaces/user";
+import type { IPublicUserWithName } from "@/interfaces/user";
 import { useAppSelector } from "@/providers/store/hooks";
 import { useChat } from "@/use-cases/create-chat";
-import { getNameInitials } from "@/utils/text-helpers";
 import { NewChatListUsersEmpty } from "./empty";
 import { NewChatListUsersShimmer } from "./shimmer";
 import type { NewChatListUsersProps } from "./types";
@@ -17,7 +16,7 @@ export function NewChatListUsers({
   button,
   handleCloseDialog,
 }: NewChatListUsersProps) {
-  const [users, setUsers] = useState<IUserWithVirtual[]>([]);
+  const [users, setUsers] = useState<IPublicUserWithName[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingCreateNewChat, setPendingCreateNewChat] = useState(false);
 
@@ -94,22 +93,16 @@ export function NewChatListUsers({
     <div className="max-h-[55vh] space-y-2 overflow-y-auto">
       {availableUsers.map((user) => (
         <div
-          key={user.email}
+          key={user._id}
           className="flex w-full items-center justify-between rounded-md"
         >
           <div className="flex items-center gap-2">
-            <Avatar className="size-12 border-2 border-border">
-              <AvatarImage
-                src={user.profilePicture}
-                alt={user.name}
-                className="object-cover"
-              />
-              {!user.profilePicture && (
-                <AvatarFallback className="text-2xl">
-                  {getNameInitials({ text: user.username })}
-                </AvatarFallback>
-              )}
-            </Avatar>
+            <UserAvatar
+              className="size-12 border-2 border-border"
+              fallbackClassName="text-2xl"
+              name={user.username}
+              src={user.profilePicture}
+            />
 
             <span>{user.name}</span>
           </div>
