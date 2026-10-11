@@ -1,5 +1,10 @@
 import type mongoose from "mongoose";
 
+export interface IPushSubscription {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+}
+
 export interface IUser {
   _id: mongoose.Types.ObjectId | string;
   clerkUserId: string;
@@ -10,6 +15,8 @@ export interface IUser {
   profilePicture?: string;
   bio?: string;
   contacts?: string[];
+  doNotDisturb?: boolean;
+  pushSubscriptions?: IPushSubscription[];
   createdAt: Date;
   updatedAt: Date;
 }

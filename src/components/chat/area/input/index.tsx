@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { MESSAGE_MAX_LENGTH } from "@/actions/message/constants";
+import { UserAvatar } from "@/components/chat/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -18,21 +19,28 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import type { IMessage } from "@/interfaces/message";
+import type { IPublicUser } from "@/interfaces/user";
 import { getSocket } from "@/lib/socket-client";
+import { cn } from "@/lib/utils";
 import { useMessageActions } from "@/use-cases/message-actions";
 import { useSendMessage } from "@/use-cases/send-message";
+import { normalizeText } from "@/utils/text-helpers";
 import { getUploadError, uploadFileToFirebase } from "@/utils/upload-helpers";
 import { EMOJIS } from "./emojis";
 
 const TYPING_IDLE_MS = 2500;
+const MAX_MENTION_SUGGESTIONS = 5;
+const MENTION_IN_PROGRESS = /(^|\s)@([\w.-]*)$/;
 
 export function ChatMessageInput({
   chatId,
   editingMessage,
+  mentionable,
   onCancelEdit,
 }: {
   chatId: string;
   editingMessage: IMessage | null;
+  mentionable: IPublicUser[];
   onCancelEdit: () => void;
 }) {
   const { sendMessage } = useSendMessage();
@@ -43,6 +51,11 @@ export function ChatMessageInput({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [mention, setMention] = useState<{
+    start: number;
+    query: string;
+  } | null>(null);
+  const [activeSuggestion, setActiveSuggestion] = useState(0);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -63,10 +76,49 @@ export function ChatMessageInput({
   // biome-ignore lint/correctness/useExhaustiveDependencies: resets when the chat or the edited message changes
   useEffect(() => {
     setText(editingMessage?.text ?? "");
+    setMention(null);
     setPhoto(null);
     setError(null);
     textareaRef.current?.focus();
   }, [chatId, editingMessage?._id]);
+
+  const suggestions = mention
+    ? mentionable
+        .filter((user) =>
+          [user.username, user.firstName].some((value) =>
+            normalizeText(value).startsWith(normalizeText(mention.query)),
+          ),
+        )
+        .slice(0, MAX_MENTION_SUGGESTIONS)
+    : [];
+
+  const updateMention = (value: string, caret: number) => {
+    const match = mentionable.length
+      ? MENTION_IN_PROGRESS.exec(value.slice(0, caret))
+      : null;
+
+    setMention(
+      match ? { start: caret - match[2].length - 1, query: match[2] } : null,
+    );
+    setActiveSuggestion(0);
+  };
+
+  const insertMention = (user: IPublicUser) => {
+    if (!mention) return;
+
+    const field = textareaRef.current;
+    const caret = field?.selectionStart ?? text.length;
+    const inserted = `@${user.username} `;
+
+    setText(`${text.slice(0, mention.start)}${inserted}${text.slice(caret)}`);
+    setMention(null);
+
+    requestAnimationFrame(() => {
+      const position = mention.start + inserted.length;
+      field?.focus();
+      field?.setSelectionRange(position, position);
+    });
+  };
 
   const announceTyping = (typing: boolean) => {
     if (typingTimer.current) clearTimeout(typingTimer.current);
@@ -86,6 +138,7 @@ export function ChatMessageInput({
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value);
+    updateMention(event.target.value, event.target.selectionStart);
     if (!editingMessage) announceTyping(event.target.value.length > 0);
   };
 
@@ -158,6 +211,28 @@ export function ChatMessageInput({
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (mention && suggestions.length) {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        const step = event.key === "ArrowDown" ? 1 : -1;
+        setActiveSuggestion(
+          (activeSuggestion + step + suggestions.length) % suggestions.length,
+        );
+        return;
+      }
+
+      if (event.key === "Enter" || event.key === "Tab") {
+        event.preventDefault();
+        insertMention(suggestions[activeSuggestion]);
+        return;
+      }
+
+      if (event.key === "Escape") {
+        setMention(null);
+        return;
+      }
+    }
+
     if (event.key === "Escape" && editingMessage) {
       onCancelEdit();
       return;
@@ -207,6 +282,42 @@ export function ChatMessageInput({
       )}
 
       {error && <p className="text-xs text-destructive">{error}</p>}
+
+      {suggestions.length > 0 && (
+        <div
+          role="listbox"
+          aria-label="Mencionar participante"
+          className="flex flex-col gap-0.5 rounded-md border bg-popover p-1 shadow-sm"
+        >
+          {suggestions.map((user, index) => (
+            <button
+              key={user._id}
+              type="button"
+              role="option"
+              aria-selected={index === activeSuggestion}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => insertMention(user)}
+              className={cn(
+                "flex items-center gap-2 rounded-sm px-2 py-1 text-left text-sm transition-colors hover:bg-accent",
+                index === activeSuggestion && "bg-accent",
+              )}
+            >
+              <UserAvatar
+                className="size-6"
+                fallbackClassName="text-[10px]"
+                name={user.username}
+                src={user.profilePicture}
+              />
+              <span className="truncate">
+                {`${user.firstName} ${user.lastName}`.trim()}
+              </span>
+              <span className="truncate text-xs text-muted-foreground">
+                @{user.username}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="flex items-end gap-1">
         <input

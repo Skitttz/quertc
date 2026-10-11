@@ -5,6 +5,8 @@ import {
   CheckIcon,
   MoreHorizontalIcon,
   PencilIcon,
+  PinIcon,
+  PinOffIcon,
   Trash2Icon,
 } from "lucide-react";
 import { REACTION_EMOJIS } from "@/actions/message/constants";
@@ -17,28 +19,38 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { IMessage } from "@/interfaces/message";
+import type { IPublicUser } from "@/interfaces/user";
 import { cn } from "@/lib/utils";
 import { formatMessageTime } from "@/utils/date-helpers";
+import { splitMentions } from "@/utils/mentions";
 
 export function ChatMessageItem({
+  canPin,
   currentUserId,
   isHighlighted,
   isMine,
+  isPinned,
   isReadByOthers,
+  mentionable,
   message,
   onDelete,
   onEdit,
   onReact,
+  onTogglePin,
   senderName,
 }: {
+  canPin: boolean;
   currentUserId: string | undefined;
   isHighlighted: boolean;
   isMine: boolean;
+  isPinned: boolean;
   isReadByOthers: boolean;
+  mentionable: IPublicUser[];
   message: IMessage;
   onDelete: (message: IMessage) => void;
   onEdit: (message: IMessage) => void;
   onReact: (message: IMessage, emoji: string) => void;
+  onTogglePin: (message: IMessage) => void;
   senderName?: string;
 }) {
   const isDeleted = Boolean(message.deletedAt);
@@ -100,13 +112,31 @@ export function ChatMessageItem({
 
                 {message.text && (
                   <p className="whitespace-pre-wrap break-words">
-                    {message.text}
+                    {splitMentions(message.text, mentionable).map(
+                      (part, index) =>
+                        part.user ? (
+                          <span
+                            // biome-ignore lint/suspicious/noArrayIndexKey: parts of one immutable text
+                            key={index}
+                            className={cn(
+                              "font-semibold",
+                              part.user._id === currentUserId &&
+                                "rounded-sm bg-amber-300/60 px-0.5 text-foreground",
+                            )}
+                          >
+                            {part.text}
+                          </span>
+                        ) : (
+                          part.text
+                        ),
+                    )}
                   </p>
                 )}
               </>
             )}
 
             <span className="mt-1 flex items-center justify-end gap-1 text-[10px] opacity-70">
+              {isPinned && <PinIcon aria-label="Fixada" className="size-3" />}
               {message.editedAt && !isDeleted && <span>editada</span>}
               {formatMessageTime(message.createdAt)}
               {isMine &&
@@ -173,6 +203,16 @@ export function ChatMessageItem({
                   </DropdownMenuItem>
                 ))}
               </div>
+
+              {canPin && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => onTogglePin(message)}>
+                    {isPinned ? <PinOffIcon /> : <PinIcon />}
+                    {isPinned ? "Desafixar" : "Fixar"}
+                  </DropdownMenuItem>
+                </>
+              )}
 
               {isMine && (
                 <>

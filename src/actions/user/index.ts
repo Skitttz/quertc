@@ -4,6 +4,7 @@ import { Types } from "mongoose";
 import { connectToDatabase } from "@/config/database";
 import type {
   IPublicUserWithName,
+  IPushSubscription,
   IUserSearchResult,
   IUserWithVirtual,
 } from "@/interfaces/user";
@@ -13,6 +14,7 @@ import { toAccentInsensitivePattern } from "@/utils/search-helpers";
 import { isFirebaseStorageUrl } from "@/utils/storage-url";
 import {
   BIO_MAX_LENGTH,
+  MAX_PUSH_SUBSCRIPTIONS,
   NAME_MAX_LENGTH,
   USER_SEARCH_LIMIT,
   USER_SEARCH_MAX_LENGTH,
@@ -288,3 +290,94 @@ export async function updateUserAvatar({ avatarUrl }: { avatarUrl: string }) {
     $set: { profilePicture: avatarUrl },
   });
 }
+
+export const setDoNotDisturb = async ({
+  enabled,
+}: {
+  enabled: boolean;
+}): Promise<boolean> => {
+  try {
+    const authUser = await getAuthenticatedUser();
+    if (!authUser) return false;
+
+    await UserModel.updateOne(
+      { _id: authUser._id },
+      { $set: { doNotDisturb: Boolean(enabled) } },
+    );
+
+    return true;
+  } catch (error) {
+    console.error("Erro ao alterar o Não Perturbe:", error);
+    return false;
+  }
+};
+
+const isPushSubscription = (value: unknown): value is IPushSubscription => {
+  const candidate = value as Partial<IPushSubscription> | null;
+
+  return (
+    typeof candidate?.endpoint === "string" &&
+    candidate.endpoint.startsWith("https://") &&
+    typeof candidate.keys?.p256dh === "string" &&
+    typeof candidate.keys?.auth === "string"
+  );
+};
+
+export const savePushSubscription = async ({
+  subscription,
+}: {
+  subscription: IPushSubscription;
+}): Promise<boolean> => {
+  try {
+    if (!isPushSubscription(subscription)) return false;
+
+    const authUser = await getAuthenticatedUser();
+    if (!authUser) return false;
+
+    const { endpoint, keys } = subscription;
+
+    await UserModel.updateOne(
+      { _id: authUser._id },
+      { $pull: { pushSubscriptions: { endpoint } } },
+    );
+    await UserModel.updateOne(
+      { _id: authUser._id },
+      {
+        $push: {
+          pushSubscriptions: {
+            $each: [
+              { endpoint, keys: { p256dh: keys.p256dh, auth: keys.auth } },
+            ],
+            $slice: -MAX_PUSH_SUBSCRIPTIONS,
+          },
+        },
+      },
+    );
+
+    return true;
+  } catch (error) {
+    console.error("Erro ao salvar inscrição de notificação:", error);
+    return false;
+  }
+};
+
+export const removePushSubscription = async ({
+  endpoint,
+}: {
+  endpoint: string;
+}): Promise<boolean> => {
+  try {
+    const authUser = await getAuthenticatedUser();
+    if (!authUser || typeof endpoint !== "string") return false;
+
+    await UserModel.updateOne(
+      { _id: authUser._id },
+      { $pull: { pushSubscriptions: { endpoint } } },
+    );
+
+    return true;
+  } catch (error) {
+    console.error("Erro ao remover inscrição de notificação:", error);
+    return false;
+  }
+};

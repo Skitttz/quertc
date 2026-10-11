@@ -3,6 +3,7 @@ import { Calendar, Hash, Loader2, LogOut, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { updateUserAvatar } from "@/actions/user";
+import { NotificationSettings } from "@/components/notifications/settings";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +18,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { disablePush } from "@/lib/push-client";
 import { AppRoutesEnum } from "@/shared/route";
 import { patchCurrentUserData } from "@/store/slice/user";
 import { formatLongDatePtBr } from "@/utils/date-helpers";
@@ -119,6 +121,7 @@ export function ProfileDrawer({
     try {
       setIsLoadingSignOut(true);
       closeDrawer();
+      await disablePush().catch(() => {});
       await signOut({ redirectUrl: AppRoutesEnum.HOME });
     } catch (error) {
       console.error(error);
@@ -223,6 +226,8 @@ export function ProfileDrawer({
           icon={<Calendar className={icon()} />}
         />
       </div>
+
+      <NotificationSettings />
 
       <AlertDialog>
         <AlertDialogTrigger asChild>

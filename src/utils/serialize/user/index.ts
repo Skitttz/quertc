@@ -10,6 +10,7 @@ export function serializeUser(user: IUserWithVirtual): IUserClient {
     lastName: user.lastName ?? "",
     username: user.username ?? "",
     bio: user.bio ?? "",
+    doNotDisturb: user.doNotDisturb ?? false,
     email: user.email ?? "",
     profilePicture: user.profilePicture ?? null,
     createdAt:

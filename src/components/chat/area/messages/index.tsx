@@ -37,7 +37,7 @@ export function ChatMessages({
   onEdit: (message: IMessage) => void;
 }) {
   const dispatch = useAppDispatch();
-  const { react, remove } = useMessageActions();
+  const { react, remove, togglePin } = useMessageActions();
   const {
     hasMoreByChat,
     highlightedMessageId,
@@ -59,6 +59,11 @@ export function ChatMessages({
   const firstId = messages[0]?._id ?? "";
   const lastMessage = messages.at(-1);
   const lastId = lastMessage?._id ?? "";
+
+  const pinnedIds = (chat.pinnedMessages ?? []).map((message) => message._id);
+  const canPin =
+    !chat.isGroupChat ||
+    Boolean(currentUserId && chat.groupAdmins?.includes(currentUserId));
 
   const otherMemberIds = chat.users
     .map((user) => user._id)
@@ -161,7 +166,11 @@ export function ChatMessages({
           return (
             <ChatMessageItem
               key={message._id}
+              canPin={canPin}
               currentUserId={currentUserId}
+              isPinned={pinnedIds.includes(message._id)}
+              mentionable={chat.isGroupChat ? chat.users : []}
+              onTogglePin={(target) => togglePin(target._id)}
               isHighlighted={message._id === highlightedMessageId}
               isMine={isMine}
               isReadByOthers={

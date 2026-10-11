@@ -23,4 +23,18 @@ function removeUsersFromChatRoom(userIds: unknown[], chatId: string) {
   }
 }
 
-export { emitToChat, emitToUsers, removeUsersFromChatRoom };
+async function getUsersViewingChat(chatId: string) {
+  const io = getSocketServer();
+  if (!io) return [];
+
+  const sockets = await io.in(chatRoom(chatId)).fetchSockets();
+
+  return [...new Set(sockets.map((socket) => String(socket.data.userId)))];
+}
+
+export {
+  emitToChat,
+  emitToUsers,
+  getUsersViewingChat,
+  removeUsersFromChatRoom,
+};

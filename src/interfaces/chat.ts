@@ -1,6 +1,11 @@
 import type { IMessage } from "./message";
 import type { IPublicUser } from "./user";
 
+type IPinnedMessage = Pick<
+  IMessage,
+  "_id" | "text" | "image" | "sender" | "createdAt" | "deletedAt"
+>;
+
 interface IChat {
   _id: string;
   users: IPublicUser[];
@@ -13,9 +18,11 @@ interface IChat {
   groupAdmins?: string[];
   createdAt: string;
   updatedAt: string;
-  unreadCounts?: Record<string, number>;
+  pinnedMessages?: IPinnedMessage[];
+  unreadCount?: number;
+  hasUnreadMention?: boolean;
   hiddenFor?: string[];
   clearedAt?: Map<string, Date>;
 }
 
-export type { IChat };
+export type { IChat, IPinnedMessage };

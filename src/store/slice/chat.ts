@@ -28,8 +28,17 @@ const chatSlice = createSlice({
       const index = state.chats.findIndex(
         (chat) => chat._id === action.payload._id,
       );
-      if (index >= 0) state.chats[index] = action.payload;
-      else state.chats.unshift(action.payload);
+      if (index < 0) {
+        state.chats.unshift(action.payload);
+        return;
+      }
+
+      const { unreadCount, hasUnreadMention } = state.chats[index];
+      state.chats[index] = {
+        ...action.payload,
+        unreadCount: action.payload.unreadCount ?? unreadCount,
+        hasUnreadMention: action.payload.hasUnreadMention ?? hasUnreadMention,
+      };
     },
     RemoveChat: (state, action: PayloadAction<string>) => {
       state.chats = state.chats.filter((chat) => chat._id !== action.payload);
@@ -40,6 +49,23 @@ const chatSlice = createSlice({
     ) => {
       const chat = state.chats.find((c) => c._id === action.payload.chatId);
       if (chat) chat.lastMessage = action.payload.message;
+    },
+    IncrementUnread: (
+      state,
+      action: PayloadAction<{ chatId: string; mentioned: boolean }>,
+    ) => {
+      const chat = state.chats.find((c) => c._id === action.payload.chatId);
+      if (!chat) return;
+
+      chat.unreadCount = (chat.unreadCount ?? 0) + 1;
+      chat.hasUnreadMention = chat.hasUnreadMention || action.payload.mentioned;
+    },
+    ResetUnread: (state, action: PayloadAction<string>) => {
+      const chat = state.chats.find((c) => c._id === action.payload);
+      if (!chat) return;
+
+      chat.unreadCount = 0;
+      chat.hasUnreadMention = false;
     },
     MarkChatRead: (
       state,
@@ -74,8 +100,10 @@ const chatSlice = createSlice({
 
 export const {
   AddChat,
+  IncrementUnread,
   MarkChatRead,
   RemoveChat,
+  ResetUnread,
   SetChatLastMessage,
   SetChats,
   UpsertChat,

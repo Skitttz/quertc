@@ -8,10 +8,12 @@ export function ChatItem({
   _id,
   groupName,
   groupProfilePicture,
+  hasUnreadMention,
   isGroupChat,
   isSelected,
   lastMessage,
   onSelect,
+  unreadCount,
   users,
 }: ChatItemProps) {
   const { currentUserData } = useAppSelector((state) => state.user);
@@ -26,9 +28,11 @@ export function ChatItem({
       typeof user === "string" ? user : user._id,
     ) ?? [];
 
-  const hasUnreadMessage = currentUserData
-    ? !readByIds.includes(currentUserData._id)
-    : false;
+  const hasUnreadMessage =
+    unreadCount !== undefined
+      ? unreadCount > 0
+      : Boolean(currentUserData && lastMessage) &&
+        !readByIds.includes(currentUserData?._id ?? "");
 
   return (
     <div
@@ -68,7 +72,24 @@ export function ChatItem({
         </div>
 
         {hasUnreadMessage && (
-          <span className="ml-auto size-2 rounded-full bg-primary" />
+          <span className="ml-auto flex shrink-0 items-center gap-1">
+            {hasUnreadMention && (
+              <span
+                title="Você foi mencionado"
+                className="flex size-5 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary"
+              >
+                @<span className="sr-only"> você foi mencionado</span>
+              </span>
+            )}
+            {unreadCount ? (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
+                {unreadCount > 99 ? "99+" : unreadCount}
+                <span className="sr-only"> não lidas</span>
+              </span>
+            ) : (
+              <span className="size-2 rounded-full bg-primary" />
+            )}
+          </span>
         )}
       </button>
     </div>

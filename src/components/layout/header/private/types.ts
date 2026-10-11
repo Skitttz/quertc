@@ -14,6 +14,7 @@ interface ISafeUserType {
   lastName?: string;
   username?: string;
   bio?: string;
+  doNotDisturb?: boolean;
   email: string;
   profilePicture?: string | null;
   createdAt: string;

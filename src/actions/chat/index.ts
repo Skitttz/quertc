@@ -4,6 +4,14 @@ import { Types } from "mongoose";
 import { connectToDatabase } from "@/config/database";
 import type { IChat } from "@/interfaces/chat";
 import { getAuthenticatedChatMember } from "@/lib/chat-access";
+import {
+  emitChatChanged,
+  getUnreadSummaries,
+  type LeanChat,
+  loadChat,
+  populatePinned,
+  toChatFor,
+} from "@/lib/chat-view";
 import { emitToUsers, removeUsersFromChatRoom } from "@/lib/socket/emit";
 import { ChatModel } from "@/models/chat";
 import { MessageModel } from "@/models/message";
@@ -23,29 +31,6 @@ function emitChatCreated({ chat }: { chat: IChat }) {
     "chat:created",
     { chat },
   );
-}
-
-type LeanChat = Omit<IChat, "clearedAt"> & {
-  clearedAt?: Record<string, string | Date>;
-};
-
-function toChatFor({
-  chat,
-  userId,
-}: {
-  chat: LeanChat;
-  userId: string;
-}): IChat {
-  const { clearedAt, hiddenFor: _hiddenFor, ...visible } = chat;
-  const clearedDate = clearedAt?.[userId];
-  const lastMessage =
-    clearedDate &&
-    visible.lastMessage &&
-    new Date(visible.lastMessage.createdAt) <= new Date(clearedDate)
-      ? null
-      : visible.lastMessage;
-
-  return JSON.parse(JSON.stringify({ ...visible, lastMessage }));
 }
 
 export const postNewChat = async ({
@@ -90,6 +75,7 @@ export const postNewChat = async ({
     )
       .populate("users", PUBLIC_USER_FIELDS)
       .populate("lastMessage")
+      .populate(populatePinned)
       .lean<LeanChat>();
 
     if (existingChat) {
@@ -224,9 +210,21 @@ export const getAllChatsByUser = async ({
       .sort({ updatedAt: -1 })
       .populate("users", PUBLIC_USER_FIELDS)
       .populate("lastMessage")
+      .populate(populatePinned)
       .lean<LeanChat[]>();
 
-    return chats.map((chat) => toChatFor({ chat, userId }));
+    const unread = await getUnreadSummaries({ chats, userId });
+
+    return chats.map((chat) =>
+      toChatFor({
+        chat,
+        userId,
+        unread: unread.get(String(chat._id)) ?? {
+          unreadCount: 0,
+          hasUnreadMention: false,
+        },
+      }),
+    );
   } catch (error) {
     console.error("Erro ao buscar chats:", error);
     return [];
@@ -256,21 +254,6 @@ export const clearChat = async ({
     return false;
   }
 };
-
-async function loadChat(chatId: unknown) {
-  return ChatModel.findById(chatId)
-    .populate("users", PUBLIC_USER_FIELDS)
-    .populate("lastMessage")
-    .lean<LeanChat>();
-}
-
-function emitChatChanged(chat: LeanChat, event = "chat:changed") {
-  for (const user of chat.users) {
-    emitToUsers([user._id], event, {
-      chat: toChatFor({ chat, userId: String(user._id) }),
-    });
-  }
-}
 
 function emitChatRemoved(chatId: string, userIds: unknown[]) {
   removeUsersFromChatRoom(userIds, chatId);
@@ -508,5 +491,56 @@ export const deleteGroup = async ({
   } catch (error) {
     console.error("Erro ao excluir grupo:", error);
     return false;
+  }
+};
+
+const MAX_PINNED_MESSAGES = 3;
+
+export const togglePinMessage = async ({
+  messageId,
+}: {
+  messageId: string;
+}): Promise<IChat | null> => {
+  try {
+    if (!Types.ObjectId.isValid(messageId)) return null;
+
+    const message =
+      await MessageModel.findById(messageId).select("chat deletedAt");
+    if (!message || message.deletedAt) return null;
+
+    const chatId = String(message.chat);
+    const member = await getAuthenticatedChatMember({ chatId });
+    if (!member) return null;
+
+    const { authUserId, chat } = member;
+    const isAdmin = (chat.groupAdmins ?? []).map(String).includes(authUserId);
+    if (chat.isGroupChat && !isAdmin) return null;
+
+    const isPinned = (chat.pinnedMessages ?? [])
+      .map(String)
+      .includes(messageId);
+
+    await ChatModel.updateOne(
+      { _id: chatId },
+      isPinned
+        ? { $pull: { pinnedMessages: messageId } }
+        : {
+            $push: {
+              pinnedMessages: {
+                $each: [messageId],
+                $slice: -MAX_PINNED_MESSAGES,
+              },
+            },
+          },
+    );
+
+    const updated = await loadChat(chatId);
+    if (!updated) return null;
+
+    emitChatChanged(updated);
+    return toChatFor({ chat: updated, userId: authUserId });
+  } catch (error) {
+    console.error("Erro ao fixar mensagem:", error);
+    return null;
   }
 };

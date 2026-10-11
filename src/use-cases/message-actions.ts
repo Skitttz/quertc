@@ -1,8 +1,10 @@
 "use client";
 
+import { togglePinMessage } from "@/actions/chat";
 import { deleteMessage, editMessage, toggleReaction } from "@/actions/message";
 import type { IMessage } from "@/interfaces/message";
 import { useAppDispatch } from "@/providers/store/hooks";
+import { UpsertChat } from "@/store/slice/chat";
 import { UpdateMessage } from "@/store/slice/message";
 
 const getChatId = (chat: IMessage["chat"]) =>
@@ -25,5 +27,10 @@ export function useMessageActions() {
       apply(await deleteMessage({ messageId })),
     react: async (messageId: string, emoji: string) =>
       apply(await toggleReaction({ messageId, emoji })),
+    togglePin: async (messageId: string) => {
+      const chat = await togglePinMessage({ messageId });
+      if (chat) dispatch(UpsertChat(chat));
+      return chat;
+    },
   };
 }

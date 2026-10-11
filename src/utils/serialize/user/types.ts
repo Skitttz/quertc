@@ -5,6 +5,7 @@ export interface IUserClient {
   lastName?: string;
   username?: string;
   bio?: string;
+  doNotDisturb?: boolean;
   name: string;
   email: string;
   profilePicture?: string | null;

@@ -14,6 +14,7 @@ export interface IMessage {
   image: string;
   readBy: Array<IPublicUser | string>;
   reactions: IMessageReaction[];
+  mentions?: string[];
   editedAt?: string | null;
   deletedAt?: string | null;
   createdAt: string;

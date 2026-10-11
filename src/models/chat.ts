@@ -35,9 +35,10 @@ const chatSchema = new mongoose.Schema(
       type: [mongoose.Schema.Types.ObjectId],
       ref: "users",
     },
-    unreadCounts: {
-      type: Object,
-      default: {},
+    pinnedMessages: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "messages",
+      default: [],
     },
     hiddenFor: {
       type: [mongoose.Schema.Types.ObjectId],

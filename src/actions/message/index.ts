@@ -3,10 +3,18 @@ import { Types } from "mongoose";
 import type { IMessage } from "@/interfaces/message";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { getAuthenticatedChatMember } from "@/lib/chat-access";
-import { emitToChat, emitToUsers } from "@/lib/socket/emit";
+import { emitChatChanged, loadChat } from "@/lib/chat-view";
+import { sendPushToUsers } from "@/lib/push";
+import {
+  emitToChat,
+  emitToUsers,
+  getUsersViewingChat,
+} from "@/lib/socket/emit";
 import { ChatModel } from "@/models/chat";
 import { MessageModel } from "@/models/message";
-import { PUBLIC_USER_FIELDS } from "@/models/user";
+import { PUBLIC_USER_FIELDS, UserModel } from "@/models/user";
+import { getMessagePreview, getUserDisplayName } from "@/utils/chat-display";
+import { getMentionedIds } from "@/utils/mentions";
 import { toAccentInsensitivePattern } from "@/utils/search-helpers";
 import { isFirebaseStorageUrl } from "@/utils/storage-url";
 import {
@@ -62,6 +70,58 @@ function emitMessageUpdated({ chat }: ChatMember, message: IMessage) {
 
   if (String(chat.lastMessage) === message._id) {
     emitToUsers(chat.users, "chat:updated", { chatId, message });
+  }
+}
+
+async function resolveMentions({ chat }: ChatMember, text: string) {
+  if (!chat.isGroupChat || !text.includes("@")) return [];
+
+  const members = await UserModel.find({ _id: { $in: chat.users } })
+    .select("username")
+    .lean();
+
+  return getMentionedIds(
+    text,
+    members.map((user) => ({ _id: String(user._id), username: user.username })),
+  );
+}
+
+async function pushNewMessage(member: ChatMember, message: IMessage) {
+  try {
+    const { authUser, authUserId, chat } = member;
+    const chatId = String(chat._id);
+    const viewing = await getUsersViewingChat(chatId);
+    const recipients = chat.users
+      .map(String)
+      .filter((id) => id !== authUserId && !viewing.includes(id));
+    if (!recipients.length) return;
+
+    const senderName = getUserDisplayName(authUser);
+    const preview = getMessagePreview(message);
+    const mentioned = message.mentions ?? [];
+
+    const send = (userIds: string[], body: string) =>
+      sendPushToUsers({
+        userIds,
+        payload: {
+          title: chat.isGroupChat ? (chat.groupName ?? "Grupo") : senderName,
+          body,
+          chatId,
+        },
+      });
+
+    await Promise.all([
+      send(
+        recipients.filter((id) => !mentioned.includes(id)),
+        chat.isGroupChat ? `${senderName}: ${preview}` : preview,
+      ),
+      send(
+        recipients.filter((id) => mentioned.includes(id)),
+        `${senderName} mencionou você: ${preview}`,
+      ),
+    ]);
+  } catch (error) {
+    console.error("[push] failed to notify", error);
   }
 }
 
@@ -196,6 +256,7 @@ export const postNewMessage = async ({
       sender: authUserId,
       text,
       image,
+      mentions: await resolveMentions(member, text),
       readBy: [authUserId],
     });
 
@@ -212,7 +273,9 @@ export const postNewMessage = async ({
     emitToUsers(chat.users, "chat:updated", {
       chatId: payload.chatId,
       message,
+      isNew: true,
     });
+    void pushNewMessage(member, message);
 
     return message;
   } catch (error) {
@@ -239,6 +302,7 @@ export const editMessage = async ({
     if (String(message.sender) !== member.authUserId) return null;
 
     message.text = newText;
+    message.mentions = await resolveMentions(member, newText);
     message.editedAt = new Date().toISOString();
     await message.save();
 
@@ -272,6 +336,18 @@ export const deleteMessage = async ({
 
     const updated = serialize<IMessage>(message.toObject());
     emitMessageUpdated(member, updated);
+
+    const wasPinned = (member.chat.pinnedMessages ?? [])
+      .map(String)
+      .includes(messageId);
+    if (wasPinned) {
+      await ChatModel.updateOne(
+        { _id: member.chat._id },
+        { $pull: { pinnedMessages: messageId } },
+      );
+      const chat = await loadChat(member.chat._id);
+      if (chat) emitChatChanged(chat);
+    }
 
     return updated;
   } catch (error) {

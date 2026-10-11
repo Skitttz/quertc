@@ -31,6 +31,34 @@ export function ChatList() {
     dispatch(fetchContacts());
   }, [currentUserData, dispatch]);
 
+  useEffect(() => {
+    const openFromNotification = (chatId: string | null | undefined) => {
+      if (chatId && chats.some((chat) => chat._id === chatId)) {
+        dispatch(SelectChat(chatId));
+        return true;
+      }
+      return false;
+    };
+
+    const url = new URL(window.location.href);
+    if (openFromNotification(url.searchParams.get("conversa"))) {
+      url.searchParams.delete("conversa");
+      window.history.replaceState(null, "", url);
+    }
+
+    if (!("serviceWorker" in navigator)) return;
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === "open-chat") {
+        openFromNotification(event.data.chatId);
+      }
+    };
+
+    navigator.serviceWorker.addEventListener("message", handleMessage);
+    return () =>
+      navigator.serviceWorker.removeEventListener("message", handleMessage);
+  }, [chats, dispatch]);
+
   const matchingChats = useMemo(
     () =>
       chats.filter((chat) =>

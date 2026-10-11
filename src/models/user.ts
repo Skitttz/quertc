@@ -20,6 +20,17 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     profilePicture: { type: String, required: false },
     bio: { type: String, required: false },
+    doNotDisturb: { type: Boolean, default: false },
+    pushSubscriptions: {
+      type: [
+        {
+          _id: false,
+          endpoint: String,
+          keys: { p256dh: String, auth: String },
+        },
+      ],
+      default: [],
+    },
     contacts: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "users",

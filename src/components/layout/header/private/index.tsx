@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Logo } from "@/components/logo";
+import { DoNotDisturbToggle } from "@/components/notifications/do-not-disturb-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAppSelector } from "@/providers/store/hooks";
 import { AppRoutesEnum } from "@/shared/route";
@@ -86,6 +87,7 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <DoNotDisturbToggle />
           <ThemeToggle />
 
           <UserMenu {...userMenuProps} />

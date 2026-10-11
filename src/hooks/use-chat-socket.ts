@@ -14,8 +14,10 @@ import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
 import { store } from "@/store";
 import {
   AddChat,
+  IncrementUnread,
   MarkChatRead,
   RemoveChat,
+  ResetUnread,
   SetChatLastMessage,
   UpsertChat,
 } from "@/store/slice/chat";
@@ -30,7 +32,11 @@ import {
 import { SetOnlineUsers, SetUserPresence } from "@/store/slice/presence";
 import { fetchChatsByUser } from "@/store/thunks/chat";
 
-type ChatSocketPayload = { chatId: string; message: IMessage };
+type ChatSocketPayload = {
+  chatId: string;
+  message: IMessage;
+  isNew?: boolean;
+};
 type TypingPayload = { chatId: string; userId: string; isTyping: boolean };
 
 const TYPING_EXPIRES_MS = 6000;
@@ -87,9 +93,21 @@ export function useChatSocket() {
       }
 
       dispatch(SetChatLastMessage(payload));
+
       if (isOpen(payload.chatId)) {
         dispatch(
           MarkChatRead({ chatId: payload.chatId, userId: currentUserId }),
+        );
+        return;
+      }
+
+      const isMine = getSenderId(payload.message.sender) === currentUserId;
+      if (payload.isNew && !isMine) {
+        dispatch(
+          IncrementUnread({
+            chatId: payload.chatId,
+            mentioned: (payload.message.mentions ?? []).includes(currentUserId),
+          }),
         );
       }
     };
@@ -115,6 +133,9 @@ export function useChatSocket() {
     const handleChatRead = (payload: { chatId: string; userId: string }) => {
       dispatch(MarkMessagesRead(payload));
       dispatch(MarkChatRead(payload));
+      if (payload.userId === currentUserId) {
+        dispatch(ResetUnread(payload.chatId));
+      }
     };
 
     const handleTyping = (payload: TypingPayload) => {
