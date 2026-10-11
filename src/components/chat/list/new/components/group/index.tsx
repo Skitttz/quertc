@@ -2,12 +2,11 @@
 
 import { CameraIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getAllUsers } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { IPublicUserWithName } from "@/interfaces/user";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/providers/store/hooks";
+import { useContacts } from "@/use-cases/contacts";
 import { useChat } from "@/use-cases/create-chat";
 import { getUploadError, uploadFileToFirebase } from "@/utils/upload-helpers";
 import { NewChatListUsersEmpty } from "../list/empty";
@@ -16,11 +15,12 @@ import { NewGroupUserItem } from "./item";
 
 export function NewGroupChatForm({
   handleCloseDialog,
+  onAddContact,
 }: {
   handleCloseDialog: () => void;
+  onAddContact: () => void;
 }) {
-  const [users, setUsers] = useState<IPublicUserWithName[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { contacts: availableUsers, loading } = useContacts();
   const [groupName, setGroupName] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [creating, setCreating] = useState(false);
@@ -31,28 +31,6 @@ export function NewGroupChatForm({
 
   const { currentUserData } = useAppSelector((state) => state.user);
   const { createGroupChat } = useChat();
-
-  const availableUsers = useMemo(() => {
-    if (!currentUserData?._id) return [];
-
-    return users.filter((user) => user._id !== currentUserData._id);
-  }, [users, currentUserData]);
-
-  useEffect(() => {
-    async function loadUsers() {
-      try {
-        setLoading(true);
-        const data = await getAllUsers();
-        if (data) setUsers(data);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (currentUserData?._id) {
-      loadUsers();
-    }
-  }, [currentUserData]);
 
   const photoPreview = useMemo(
     () => (photo ? URL.createObjectURL(photo) : null),
@@ -195,7 +173,7 @@ export function NewGroupChatForm({
         </div>
       </div>
 
-      {loading ? (
+      {loading && !availableUsers.length ? (
         <NewChatListUsersShimmer />
       ) : availableUsers.length ? (
         <div className="max-h-[45vh] space-y-2 overflow-y-auto">
@@ -209,7 +187,11 @@ export function NewGroupChatForm({
           ))}
         </div>
       ) : (
-        <NewChatListUsersEmpty description="Parece que não há usuários disponíveis para adicionar ao grupo." />
+        <NewChatListUsersEmpty
+          title="Você ainda não tem contatos"
+          description="O grupo pode começar só com você, ou adicione contatos antes."
+          action={{ label: "Adicionar contato", onClick: onAddContact }}
+        />
       )}
 
       {error && <p className="text-sm text-destructive">{error}</p>}

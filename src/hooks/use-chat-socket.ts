@@ -12,10 +12,18 @@ import {
 } from "@/lib/socket-client";
 import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
 import { store } from "@/store";
-import { AddChat, MarkChatRead, SetChatLastMessage } from "@/store/slice/chat";
+import {
+  AddChat,
+  MarkChatRead,
+  RemoveChat,
+  SetChatLastMessage,
+  UpsertChat,
+} from "@/store/slice/chat";
 import {
   AddMessage,
+  ForgetChatMessages,
   MarkMessagesRead,
+  SelectChat,
   SetTyping,
   UpdateMessage,
 } from "@/store/slice/message";
@@ -90,6 +98,16 @@ export function useChatSocket() {
       dispatch(AddChat(chat));
     };
 
+    const handleChatChanged = ({ chat }: { chat: IChat }) => {
+      dispatch(UpsertChat(chat));
+    };
+
+    const handleChatRemoved = ({ chatId }: { chatId: string }) => {
+      if (isOpen(chatId)) dispatch(SelectChat(null));
+      dispatch(RemoveChat(chatId));
+      dispatch(ForgetChatMessages(chatId));
+    };
+
     const handleMessageUpdated = (payload: ChatSocketPayload) => {
       dispatch(UpdateMessage(payload));
     };
@@ -121,6 +139,8 @@ export function useChatSocket() {
     socket.on("message:updated", handleMessageUpdated);
     socket.on("chat:updated", handleChatUpdated);
     socket.on("chat:created", handleChatCreated);
+    socket.on("chat:changed", handleChatChanged);
+    socket.on("chat:removed", handleChatRemoved);
     socket.on("chat:read", handleChatRead);
     socket.on("typing", handleTyping);
     socket.on("presence:sync", ({ online }: { online: string[] }) =>

@@ -14,4 +14,13 @@ function emitToUsers(userIds: unknown[], event: string, payload: unknown) {
   }
 }
 
-export { emitToChat, emitToUsers };
+function removeUsersFromChatRoom(userIds: unknown[], chatId: string) {
+  const io = getSocketServer();
+  if (!io) return;
+
+  for (const userId of userIds) {
+    io.in(userRoom(String(userId))).socketsLeave(chatRoom(chatId));
+  }
+}
+
+export { emitToChat, emitToUsers, removeUsersFromChatRoom };

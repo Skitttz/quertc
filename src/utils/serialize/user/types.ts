@@ -4,6 +4,7 @@ export interface IUserClient {
   firstName?: string;
   lastName?: string;
   username?: string;
+  bio?: string;
   name: string;
   email: string;
   profilePicture?: string | null;

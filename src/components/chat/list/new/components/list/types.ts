@@ -1,8 +1,6 @@
 interface NewChatListUsersProps {
-  button?: {
-    labelAction?: string;
-  };
   handleCloseDialog: () => void;
+  onAddContact: () => void;
 }
 
 export type { NewChatListUsersProps };

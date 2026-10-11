@@ -6,6 +6,7 @@ import { getAuthenticatedChatMember } from "@/lib/chat-access";
 import { emitToChat, emitToUsers } from "@/lib/socket/emit";
 import { ChatModel } from "@/models/chat";
 import { MessageModel } from "@/models/message";
+import { PUBLIC_USER_FIELDS } from "@/models/user";
 import { toAccentInsensitivePattern } from "@/utils/search-helpers";
 import { isFirebaseStorageUrl } from "@/utils/storage-url";
 import {
@@ -108,6 +109,7 @@ export const getMessagesByChat = async ({
         })
           .sort({ createdAt: -1 })
           .limit(MESSAGE_CONTEXT_SIZE + 1)
+          .populate("sender", PUBLIC_USER_FIELDS)
           .lean(),
         MessageModel.find({
           chat: chatId,
@@ -115,6 +117,7 @@ export const getMessagesByChat = async ({
         })
           .sort({ createdAt: 1 })
           .limit(MESSAGE_AROUND_LIMIT)
+          .populate("sender", PUBLIC_USER_FIELDS)
           .lean(),
       ]);
 
@@ -139,6 +142,7 @@ export const getMessagesByChat = async ({
     })
       .sort({ createdAt: -1 })
       .limit(MESSAGE_PAGE_SIZE + 1)
+      .populate("sender", PUBLIC_USER_FIELDS)
       .lean();
 
     return serialize({

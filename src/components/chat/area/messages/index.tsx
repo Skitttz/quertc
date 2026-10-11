@@ -175,7 +175,9 @@ export function ChatMessages({
               senderName={
                 chat.isGroupChat && !isMine
                   ? getUserDisplayName(
-                      chat.users.find((user) => user._id === senderId),
+                      typeof message.sender === "string"
+                        ? chat.users.find((user) => user._id === senderId)
+                        : message.sender,
                     )
                   : undefined
               }

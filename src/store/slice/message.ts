@@ -68,7 +68,11 @@ const messageSlice = createSlice({
       const messages = state.messagesByChat[chatId];
       const index = messages?.findIndex((item) => item._id === message._id);
       if (messages && index !== undefined && index >= 0) {
-        messages[index] = message;
+        const known = messages[index].sender;
+        messages[index] =
+          typeof message.sender === "string" && typeof known !== "string"
+            ? { ...message, sender: known }
+            : message;
       }
     },
     MarkMessagesRead: (

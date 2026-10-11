@@ -25,6 +25,7 @@ import { getUploadError, uploadFileToFirebase } from "@/utils/upload-helpers";
 import { AvatarOverlay } from "./avatar";
 import { AvatarOverlayEnum } from "./constants";
 import { ItemInfo } from "./itemInfo";
+import { ProfileForm } from "./profile-form";
 import { drawerStyles } from "./styles";
 import type { IProfileDrawerProps, IUploadStateProps } from "./types";
 
@@ -135,7 +136,7 @@ export function ProfileDrawer({
   return (
     <SheetContent
       side="right"
-      className="w-[280px] sm:w-[320px] p-6 flex flex-col gap-6"
+      className="w-[280px] sm:w-[320px] p-6 flex flex-col gap-6 overflow-y-auto"
     >
       <SheetHeader className="sr-only">
         <SheetTitle>Perfil do Usuário</SheetTitle>
@@ -200,6 +201,8 @@ export function ProfileDrawer({
         )}
       </div>
 
+      <ProfileForm />
+
       <div className="flex flex-col gap-4 border-t pt-4">
         <ItemInfo
           name="Seu nome"
@@ -211,7 +214,7 @@ export function ProfileDrawer({
           value={userId}
           icon={<Hash className={icon()} />}
           tooltip={{
-            content: "Compartilhe este ID para iniciar uma nova conversa",
+            content: "Compartilhe este ID para que adicionem você aos contatos",
           }}
         />
         <ItemInfo

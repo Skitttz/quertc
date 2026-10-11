@@ -1,9 +1,15 @@
 "use client";
 
-import { ArrowLeftIcon, MoreVerticalIcon, Trash2Icon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  InfoIcon,
+  MoreVerticalIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { useState } from "react";
 import { clearChat } from "@/actions/chat";
 import { ZoomableAvatar } from "@/components/chat/avatar-zoom";
+import { ChatDetails } from "@/components/chat/details";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +38,7 @@ export function ChatAreaHeader({ chat }: { chat: IChat }) {
   const { currentUserData } = useAppSelector((state) => state.user);
   const onlineUserIds = useAppSelector((state) => state.presence.onlineUserIds);
   const [confirmingClear, setConfirmingClear] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const { avatarSrc, displayName } = getChatDisplay({
     chat,
@@ -78,14 +85,21 @@ export function ChatAreaHeader({ chat }: { chat: IChat }) {
         src={avatarSrc}
       />
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <p className="truncate font-semibold">{displayName}</p>
+      <button
+        type="button"
+        aria-label={
+          chat.isGroupChat ? "Ver dados do grupo" : "Ver dados do contato"
+        }
+        onClick={() => setDetailsOpen(true)}
+        className="flex min-w-0 flex-1 flex-col text-left"
+      >
+        <span className="truncate font-semibold">{displayName}</span>
         {status && (
           <span className="truncate text-xs text-muted-foreground">
             {status}
           </span>
         )}
-      </div>
+      </button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -94,6 +108,10 @@ export function ChatAreaHeader({ chat }: { chat: IChat }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setDetailsOpen(true)}>
+            <InfoIcon />
+            {chat.isGroupChat ? "Dados do grupo" : "Dados do contato"}
+          </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
             onClick={() => setConfirmingClear(true)}
@@ -103,6 +121,12 @@ export function ChatAreaHeader({ chat }: { chat: IChat }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <ChatDetails
+        chat={chat}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+      />
 
       <AlertDialog open={confirmingClear} onOpenChange={setConfirmingClear}>
         <AlertDialogContent>

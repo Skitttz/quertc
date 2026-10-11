@@ -1,4 +1,4 @@
-import { UserAvatar } from "@/components/chat/avatar";
+import { ZoomableAvatar } from "@/components/chat/avatar-zoom";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/providers/store/hooks";
 import { getChatDisplay, getMessagePreview } from "@/utils/chat-display";
@@ -31,42 +31,46 @@ export function ChatItem({
     : false;
 
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(_id)}
+    <div
       className={cn(
-        "flex w-full items-center gap-3 rounded-md p-2 text-left transition-colors hover:bg-accent",
+        "flex w-full items-center gap-3 rounded-md p-2 transition-colors hover:bg-accent",
         isSelected && "bg-accent",
       )}
     >
-      <UserAvatar
+      <ZoomableAvatar
         className="size-12"
         fallbackClassName="text-lg"
-        name={displayName}
+        name={displayName ?? ""}
         src={avatarSrc}
       />
 
-      <div className="flex min-w-0 flex-col gap-1">
-        <p className="truncate font-semibold">{displayName}</p>
+      <button
+        type="button"
+        onClick={() => onSelect(_id)}
+        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+      >
+        <div className="flex min-w-0 flex-col gap-1">
+          <p className="truncate font-semibold">{displayName}</p>
 
-        {lastMessage ? (
-          <span
-            className={`truncate text-sm ${
-              hasUnreadMessage
-                ? "font-medium text-foreground"
-                : "text-muted-foreground"
-            }`}
-          >
-            {getMessagePreview(lastMessage)}
-          </span>
-        ) : (
-          <span className="text-sm text-muted-foreground"></span>
+          {lastMessage ? (
+            <span
+              className={`truncate text-sm ${
+                hasUnreadMessage
+                  ? "font-medium text-foreground"
+                  : "text-muted-foreground"
+              }`}
+            >
+              {getMessagePreview(lastMessage)}
+            </span>
+          ) : (
+            <span className="text-sm text-muted-foreground"></span>
+          )}
+        </div>
+
+        {hasUnreadMessage && (
+          <span className="ml-auto size-2 rounded-full bg-primary" />
         )}
-      </div>
-
-      {hasUnreadMessage && (
-        <span className="ml-auto size-2 rounded-full bg-primary" />
-      )}
-    </button>
+      </button>
+    </div>
   );
 }

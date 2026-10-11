@@ -10,7 +10,6 @@ export function UserMenu({
   userId,
   profilePicture,
   registrationDate,
-  variant,
   onAvatarChange,
   onAvatarLoaded,
   isAvatarLoading,
@@ -18,11 +17,7 @@ export function UserMenu({
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
-        <UserMenuTrigger
-          name={name}
-          profilePicture={profilePicture}
-          variant={variant}
-        />
+        <UserMenuTrigger name={name} profilePicture={profilePicture} />
       </SheetTrigger>
 
       <ProfileDrawer

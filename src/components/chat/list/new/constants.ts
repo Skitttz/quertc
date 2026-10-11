@@ -10,6 +10,10 @@ const newChatDropdownItems = [
     dialogKey: NewChatDialogKeyEnum.NEW_CHAT,
   },
   { label: "Criar novo grupo", dialogKey: NewChatDialogKeyEnum.NEW_GROUP },
+  {
+    label: "Adicionar contato",
+    dialogKey: NewChatDialogKeyEnum.ADD_CONTACT,
+  },
 ] as const;
 
 export { NewChatDialogKeyEnum, newChatDropdownItems };

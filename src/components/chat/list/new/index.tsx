@@ -42,6 +42,7 @@ export function NewChatDropdown() {
         <NewChatDialog
           open={openVariant !== null}
           variant={openVariant}
+          onVariantChange={setOpenVariant}
           onOpenChange={(open) => {
             if (!open) setOpenVariant(null);
           }}

@@ -1,10 +1,11 @@
-type UpdateUserInput<T> = {
-  userId: string;
-  payload: Partial<T>;
-};
+interface IRequestUpdateProfile {
+  firstName: string;
+  lastName: string;
+  bio: string;
+}
 
-type AllowedUserFieldsUpdateType = "firstName" | "lastName" | "profilePicture";
+type UpdateProfileResult =
+  | { data: IRequestUpdateProfile & { name: string } }
+  | { error: string };
 
-type UpdateUserResult<T> = { data: T } | { error: string };
-
-export type { AllowedUserFieldsUpdateType, UpdateUserInput, UpdateUserResult };
+export type { IRequestUpdateProfile, UpdateProfileResult };

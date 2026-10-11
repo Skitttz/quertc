@@ -1,15 +1,15 @@
 const dialogConfig = {
   "add-contact": {
-    title: "Adicionar novo contato",
-    description: "Escolha ou adicione um novo contato",
+    title: "Adicionar contato",
+    description: "Encontre a pessoa pelo nome, usuário ou ID",
   },
   "new-chat": {
     title: "Criar nova conversa",
-    description: "Selecione um usuário para iniciar uma conversa",
+    description: "Escolha um dos seus contatos",
   },
   "new-group": {
     title: "Criar novo grupo",
-    description: "Adicione participantes ao grupo",
+    description: "Dê um nome e escolha os participantes entre os seus contatos",
   },
 } as const;
 

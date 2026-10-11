@@ -26,6 +26,7 @@ export function Header() {
         _id: String(currentUserData._id || ""),
         clerkUserId: currentUserData.clerkUserId ?? null,
         name: currentUserData.name ?? "",
+        username: currentUserData.username,
         email: currentUserData.email ?? "",
         profilePicture: currentUserData?.profilePicture,
         createdAt: currentUserData.createdAt,
@@ -87,13 +88,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
 
-          <div className="hidden md:flex">
-            <UserMenu {...userMenuProps} variant="desktop" />
-          </div>
-
-          <div className="flex md:hidden">
-            <UserMenu {...userMenuProps} variant="mobile" />
-          </div>
+          <UserMenu {...userMenuProps} />
         </div>
       </div>
     </header>

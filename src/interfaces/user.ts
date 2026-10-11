@@ -9,6 +9,7 @@ export interface IUser {
   email: string;
   profilePicture?: string;
   bio?: string;
+  contacts?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,4 +29,8 @@ export interface IPublicUser {
 
 export interface IPublicUserWithName extends IPublicUser {
   name: string;
+}
+
+export interface IUserSearchResult extends IPublicUserWithName {
+  isContact: boolean;
 }

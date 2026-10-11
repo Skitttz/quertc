@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
 import type { ChatState } from "@/store/slice/chat";
 import { OpenMessage, SelectChat } from "@/store/slice/message";
 import { fetchChatsByUser } from "@/store/thunks/chat";
+import { fetchContacts } from "@/store/thunks/contact";
 import { chatMatchesSearch } from "@/utils/chat-display";
 import { ChatHeaderList } from "./header";
 import { ChatItem } from "./item";
@@ -27,6 +28,7 @@ export function ChatList() {
   useEffect(() => {
     if (!currentUserData) return;
     dispatch(fetchChatsByUser(currentUserData._id));
+    dispatch(fetchContacts());
   }, [currentUserData, dispatch]);
 
   const matchingChats = useMemo(

@@ -6,6 +6,10 @@ export function serializeUser(user: IUserWithVirtual): IUserClient {
     _id: user._id.toString(),
     clerkUserId: user.clerkUserId,
     name: user.name ?? "",
+    firstName: user.firstName ?? "",
+    lastName: user.lastName ?? "",
+    username: user.username ?? "",
+    bio: user.bio ?? "",
     email: user.email ?? "",
     profilePicture: user.profilePicture ?? null,
     createdAt:

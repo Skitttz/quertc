@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     profilePicture: { type: String, required: false },
     bio: { type: String, required: false },
+    contacts: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "users",
+      default: [],
+    },
   },
   { timestamps: true },
 );

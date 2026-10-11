@@ -1,3 +1,13 @@
-const ALLOWED_FIELDS = ["firstName", "lastName", "profilePicture"] as const;
+const USER_SEARCH_MIN_LENGTH = 2;
+const USER_SEARCH_MAX_LENGTH = 50;
+const USER_SEARCH_LIMIT = 10;
+const NAME_MAX_LENGTH = 50;
+const BIO_MAX_LENGTH = 160;
 
-export { ALLOWED_FIELDS };
+export {
+  BIO_MAX_LENGTH,
+  NAME_MAX_LENGTH,
+  USER_SEARCH_LIMIT,
+  USER_SEARCH_MAX_LENGTH,
+  USER_SEARCH_MIN_LENGTH,
+};
