@@ -11,6 +11,7 @@ export function ChatSearchResults({
   currentUserId,
   matchingChats,
   messages,
+  onOpenMessage,
   onSelect,
   query,
   searchingMessages,
@@ -20,6 +21,7 @@ export function ChatSearchResults({
   currentUserId: string | undefined;
   matchingChats: IChat[];
   messages: IMessage[];
+  onOpenMessage: (chatId: string, messageId: string) => void;
   onSelect: (chatId: string) => void;
   query: string;
   searchingMessages: boolean;
@@ -70,7 +72,7 @@ export function ChatSearchResults({
               currentUserId={currentUserId}
               isSelected={chat._id === selectedChatId}
               message={message}
-              onSelect={onSelect}
+              onSelect={(chatId) => onOpenMessage(chatId, message._id)}
               query={query}
             />
           ))}

@@ -14,6 +14,8 @@ interface IChat {
   createdAt: string;
   updatedAt: string;
   unreadCounts?: Record<string, number>;
+  hiddenFor?: string[];
+  clearedAt?: Map<string, Date>;
 }
 
 export type { IChat };

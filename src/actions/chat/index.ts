@@ -2,8 +2,8 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { connectToDatabase } from "@/config/database";
 import type { IChat } from "@/interfaces/chat";
-import { userRoom } from "@/lib/socket/rooms";
-import { getSocketServer } from "@/lib/socket-server";
+import { getAuthenticatedChatMember } from "@/lib/chat-access";
+import { emitToUsers } from "@/lib/socket/emit";
 import { ChatModel } from "@/models/chat";
 import { PUBLIC_USER_FIELDS, UserModel } from "@/models/user";
 import { isFirebaseStorageUrl } from "@/utils/storage-url";
@@ -14,12 +14,34 @@ import type {
 } from "./types";
 
 function emitChatCreated({ chat }: { chat: IChat }) {
-  const io = getSocketServer();
-  if (!io) return;
+  emitToUsers(
+    chat.users.map((user) => user._id),
+    "chat:created",
+    { chat },
+  );
+}
 
-  for (const user of chat.users) {
-    io.to(userRoom(String(user._id))).emit("chat:created", { chat });
-  }
+type LeanChat = Omit<IChat, "clearedAt"> & {
+  clearedAt?: Record<string, string | Date>;
+};
+
+function toChatFor({
+  chat,
+  userId,
+}: {
+  chat: LeanChat;
+  userId: string;
+}): IChat {
+  const { clearedAt, hiddenFor: _hiddenFor, ...visible } = chat;
+  const clearedDate = clearedAt?.[userId];
+  const lastMessage =
+    clearedDate &&
+    visible.lastMessage &&
+    new Date(visible.lastMessage.createdAt) <= new Date(clearedDate)
+      ? null
+      : visible.lastMessage;
+
+  return JSON.parse(JSON.stringify({ ...visible, lastMessage }));
 }
 
 export const postNewChat = async ({
@@ -57,16 +79,20 @@ export const postNewChat = async ({
       return null;
     }
 
-    const existingChat = await ChatModel.findOne({
-      isGroupChat: false,
-      users: { $all: [userA, userB] },
-    })
+    const existingChat = await ChatModel.findOneAndUpdate(
+      { isGroupChat: false, users: { $all: [userA, userB] } },
+      { $pull: { hiddenFor: authUserId } },
+      { new: true },
+    )
       .populate("users", PUBLIC_USER_FIELDS)
       .populate("lastMessage")
-      .lean();
+      .lean<LeanChat>();
 
     if (existingChat) {
-      return JSON.parse(JSON.stringify(existingChat));
+      return toChatFor({
+        chat: existingChat,
+        userId: authUserId,
+      }) as CreateChatResponse;
     }
 
     const newChat = await ChatModel.create({ ...payload, isGroupChat: false });
@@ -187,17 +213,42 @@ export const getAllChatsByUser = async ({
       return [];
     }
 
-    const chats = await ChatModel.find({ users: { $in: [userId] } })
+    const chats = await ChatModel.find({
+      users: { $in: [userId] },
+      hiddenFor: { $ne: userId },
+    })
       .sort({ updatedAt: -1 })
       .populate("users", PUBLIC_USER_FIELDS)
       .populate("lastMessage")
-      .lean<IChat[]>();
+      .lean<LeanChat[]>();
 
-    const formattedChats = JSON.parse(JSON.stringify(chats));
-
-    return formattedChats;
+    return chats.map((chat) => toChatFor({ chat, userId }));
   } catch (error) {
     console.error("Erro ao buscar chats:", error);
     return [];
+  }
+};
+
+export const clearChat = async ({
+  chatId,
+}: {
+  chatId: string;
+}): Promise<boolean> => {
+  try {
+    const member = await getAuthenticatedChatMember({ chatId });
+    if (!member) return false;
+
+    await ChatModel.updateOne(
+      { _id: chatId },
+      {
+        $set: { [`clearedAt.${member.authUserId}`]: new Date() },
+        $addToSet: { hiddenFor: member.authUserId },
+      },
+    );
+
+    return true;
+  } catch (error) {
+    console.error("Erro ao apagar conversa:", error);
+    return false;
   }
 };

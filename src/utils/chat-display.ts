@@ -1,4 +1,5 @@
 import type { IChat } from "@/interfaces/chat";
+import type { IMessage } from "@/interfaces/message";
 import { normalizeText } from "./text-helpers";
 
 type ChatDisplaySource = Pick<
@@ -52,4 +53,22 @@ const chatMatchesSearch = ({
   ].some((value) => normalizeText(value ?? "").includes(term));
 };
 
-export { chatMatchesSearch, getChatDisplay };
+const getMessagePreview = (
+  message: Pick<IMessage, "text" | "image" | "deletedAt">,
+) => {
+  if (message.deletedAt) return "Mensagem apagada";
+  if (message.text) return message.text;
+  if (message.image) return "📷 Foto";
+  return "";
+};
+
+const getUserDisplayName = (
+  user: { firstName?: string; username?: string } | undefined,
+) => user?.firstName || user?.username || "Alguém";
+
+export {
+  chatMatchesSearch,
+  getChatDisplay,
+  getMessagePreview,
+  getUserDisplayName,
+};

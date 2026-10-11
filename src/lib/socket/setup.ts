@@ -3,6 +3,12 @@ import { Server } from "socket.io";
 import { setSocketServer } from "@/lib/socket-server";
 import { ChatModel } from "@/models/chat";
 import { resolveSocketUserId } from "./auth";
+import {
+  isOnline,
+  markConnected,
+  markDisconnected,
+  presenceRoom,
+} from "./presence";
 import { chatRoom, userRoom } from "./rooms";
 
 function setupSocketServer(httpServer: HTTPServer): Server {
@@ -47,6 +53,52 @@ function setupSocketServer(httpServer: HTTPServer): Server {
 
     socket.on("chat:leave", (chatId: string) => {
       socket.leave(chatRoom(chatId));
+    });
+
+    socket.on(
+      "typing",
+      ({ chatId, isTyping }: { chatId?: string; isTyping?: boolean } = {}) => {
+        if (!chatId || !socket.rooms.has(chatRoom(chatId))) return;
+
+        socket.to(chatRoom(chatId)).emit("typing", {
+          chatId,
+          userId,
+          isTyping: Boolean(isTyping),
+        });
+      },
+    );
+
+    socket.on("presence:watch", async () => {
+      try {
+        const memberIds: unknown[] = await ChatModel.find({
+          users: { $in: [userId] },
+        }).distinct("users");
+        const contactIds = memberIds.map(String).filter((id) => id !== userId);
+
+        for (const contactId of contactIds) {
+          socket.join(presenceRoom(contactId));
+        }
+
+        socket.emit("presence:sync", { online: contactIds.filter(isOnline) });
+      } catch (error) {
+        console.error("[socket] presence:watch failed", error);
+      }
+    });
+
+    if (markConnected(userId)) {
+      io.to(presenceRoom(userId)).emit("presence:update", {
+        userId,
+        online: true,
+      });
+    }
+
+    socket.on("disconnect", () => {
+      if (markDisconnected(userId)) {
+        io.to(presenceRoom(userId)).emit("presence:update", {
+          userId,
+          online: false,
+        });
+      }
     });
   });
 

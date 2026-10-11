@@ -1,7 +1,7 @@
 import { UserAvatar } from "@/components/chat/avatar";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/providers/store/hooks";
-import { getChatDisplay } from "@/utils/chat-display";
+import { getChatDisplay, getMessagePreview } from "@/utils/chat-display";
 import type { ChatItemProps } from "./types";
 
 export function ChatItem({
@@ -57,7 +57,7 @@ export function ChatItem({
                 : "text-muted-foreground"
             }`}
           >
-            {lastMessage.text}
+            {getMessagePreview(lastMessage)}
           </span>
         ) : (
           <span className="text-sm text-muted-foreground"></span>

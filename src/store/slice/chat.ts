@@ -24,6 +24,9 @@ const chatSlice = createSlice({
       if (state.chats.some((chat) => chat._id === action.payload._id)) return;
       state.chats.unshift(action.payload);
     },
+    RemoveChat: (state, action: PayloadAction<string>) => {
+      state.chats = state.chats.filter((chat) => chat._id !== action.payload);
+    },
     SetChatLastMessage: (
       state,
       action: PayloadAction<{ chatId: string; message: IMessage }>,
@@ -62,6 +65,11 @@ const chatSlice = createSlice({
   },
 });
 
-export const { SetChats, AddChat, SetChatLastMessage, MarkChatRead } =
-  chatSlice.actions;
+export const {
+  AddChat,
+  MarkChatRead,
+  RemoveChat,
+  SetChatLastMessage,
+  SetChats,
+} = chatSlice.actions;
 export default chatSlice.reducer;

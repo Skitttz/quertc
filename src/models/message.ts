@@ -22,6 +22,18 @@ const messageSchema = new mongoose.Schema(
       default: "",
     },
     readBy: { type: [mongoose.Schema.Types.ObjectId], ref: "users" },
+    reactions: {
+      type: [
+        {
+          _id: false,
+          user: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+          emoji: String,
+        },
+      ],
+      default: [],
+    },
+    editedAt: { type: Date, default: null },
+    deletedAt: { type: Date, default: null },
   },
   { timestamps: true },
 );

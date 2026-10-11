@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import chatReducer from "./slice/chat";
 import messageReducer from "./slice/message";
+import presenceReducer from "./slice/presence";
 import userReducer from "./slice/user";
 
 export const store = configureStore({
@@ -8,6 +9,7 @@ export const store = configureStore({
     user: userReducer,
     chat: chatReducer,
     message: messageReducer,
+    presence: presenceReducer,
   },
 });
 

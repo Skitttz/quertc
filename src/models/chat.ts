@@ -39,6 +39,16 @@ const chatSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
+    hiddenFor: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "users",
+      default: [],
+    },
+    clearedAt: {
+      type: Map,
+      of: Date,
+      default: {},
+    },
   },
   { timestamps: true },
 );

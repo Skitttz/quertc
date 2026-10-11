@@ -5,7 +5,7 @@ import { useMessageSearch } from "@/hooks/use-message-search";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/providers/store/hooks";
 import type { ChatState } from "@/store/slice/chat";
-import { SelectChat } from "@/store/slice/message";
+import { OpenMessage, SelectChat } from "@/store/slice/message";
 import { fetchChatsByUser } from "@/store/thunks/chat";
 import { chatMatchesSearch } from "@/utils/chat-display";
 import { ChatHeaderList } from "./header";
@@ -53,6 +53,9 @@ export function ChatList() {
           currentUserId={currentUserData?._id}
           matchingChats={matchingChats}
           messages={messageResults}
+          onOpenMessage={(chatId, messageId) =>
+            dispatch(OpenMessage({ chatId, messageId }))
+          }
           onSelect={handleSelect}
           query={query}
           searchingMessages={searchingMessages}
