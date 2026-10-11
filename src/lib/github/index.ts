@@ -61,13 +61,6 @@ export function extractFirstImage(body: string): string | null {
   return null;
 }
 
-export function removeImagesFromBody(body: string): string {
-  if (!body) return "";
-  let result = body.replace(/!\[.*?\]\(.*?\)/g, "");
-  result = result.replace(/<img [^>]*>/g, "");
-  return result;
-}
-
 export function getPostPreviewSimple(body: string, maxLength = 150) {
   if (!body) return "";
   let clean = body.replace(/!\[.*?\]\(.*?\)/g, "").replace(/<img [^>]*>/g, "");
